@@ -3675,16 +3675,15 @@ form.submitting button[type="submit"]::before {
 }
 
 /* ==========================================
-   PRICE SUMMARY BOX - Enhanced Premium Design
+   PRICE SUMMARY BOX - New Modern Design v2.0
    ========================================== */
 .price-summary-box {
-    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+    background: linear-gradient(165deg, #ffffff 0%, #f8fafc 40%, #eef2ff 100%);
     border-radius: var(--radius-xl);
     overflow: hidden;
-    box-shadow: 0 10px 40px rgba(88, 75, 246, 0.15),
-                0 6px 20px rgba(0, 0, 0, 0.08),
-                inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(88, 75, 246, 0.12);
+    box-shadow: 0 12px 35px rgba(88, 75, 246, 0.12),
+                0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 2px solid rgba(88, 75, 246, 0.08);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
 }
@@ -3696,166 +3695,164 @@ form.submitting button[type="submit"]::before {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.price-summary-box:hover {
-    box-shadow: 0 16px 50px rgba(88, 75, 246, 0.22),
-                0 10px 30px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 1);
-    transform: translateY(-4px) scale(1.01);
-}
-
-.price-summary-box:hover::before {
+    background: linear-gradient(90deg, var(--success), var(--primary), var(--accent));
     opacity: 1;
 }
 
+.price-summary-box:hover {
+    box-shadow: 0 18px 45px rgba(88, 75, 246, 0.18),
+                0 8px 25px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    border-color: rgba(88, 75, 246, 0.15);
+}
+
 .price-summary-header {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 50%, #3730a3 100%);
+    background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
     color: white;
-    padding: 16px 20px;
+    padding: 18px 22px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 1.05rem;
     position: relative;
     overflow: hidden;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .price-summary-header::before {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 100%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+    top: -100%;
+    right: -100%;
+    width: 200%;
+    height: 300%;
+    background: radial-gradient(circle, rgba(88, 75, 246, 0.15) 0%, transparent 50%);
     pointer-events: none;
 }
 
 .price-summary-header i {
-    font-size: 1.2rem;
-    opacity: 0.95;
-    animation: pulse 2s ease-in-out infinite;
+    font-size: 1.3rem;
+    opacity: 1;
+    color: var(--success);
+    background: rgba(0, 200, 81, 0.15);
+    padding: 10px;
+    border-radius: 12px;
 }
 
 .price-summary-body {
-    padding: 20px;
-    background: linear-gradient(180deg, transparent 0%, rgba(88, 75, 246, 0.02) 100%);
+    padding: 22px;
+    background: transparent;
 }
 
-/* Route Display in Summary - Enhanced */
+/* Route Display in Summary - New Modern Design */
 .price-summary-route {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: linear-gradient(135deg, rgba(88, 75, 246, 0.06) 0%, rgba(6, 182, 212, 0.06) 50%, rgba(0, 200, 81, 0.04) 100%);
-    padding: 16px 18px;
-    border-radius: var(--radius-lg);
-    margin-bottom: 20px;
-    border: 1px dashed rgba(88, 75, 246, 0.25);
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 18px 20px;
+    border-radius: 16px;
+    margin-bottom: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
     position: relative;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .price-summary-route::before {
     content: '';
     position: absolute;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60%;
-    height: 2px;
-    background: linear-gradient(90deg, var(--success), var(--primary), var(--danger));
-    opacity: 0.3;
+    left: 25%;
+    right: 25%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--success), var(--gray-300), var(--danger));
+    border-radius: 3px;
+    transform: translateY(-50%);
     z-index: 0;
 }
 
 .price-summary-route .route-point {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
-    flex: 1;
+    gap: 8px;
+    flex: 0 0 auto;
     z-index: 1;
-    background: rgba(255, 255, 255, 0.8);
-    padding: 8px 12px;
-    border-radius: var(--radius);
-    backdrop-filter: blur(5px);
+    background: white;
+    padding: 10px 16px;
+    border-radius: 12px;
+    min-width: 100px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
 .price-summary-route .route-point.pickup {
-    border: 1px solid rgba(0, 200, 81, 0.3);
+    border: 2px solid rgba(0, 200, 81, 0.25);
 }
 
 .price-summary-route .route-point.dropoff {
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    border: 2px solid rgba(239, 68, 68, 0.25);
 }
 
 .price-summary-route .route-point.pickup i {
-    color: var(--success);
-    font-size: 1.1rem;
-    filter: drop-shadow(0 2px 4px rgba(0, 200, 81, 0.3));
+    color: white;
+    font-size: 0.9rem;
+    background: linear-gradient(135deg, var(--success), #16a34a);
+    padding: 8px;
+    border-radius: 50%;
+    box-shadow: 0 3px 10px rgba(0, 200, 81, 0.3);
 }
 
 .price-summary-route .route-point.dropoff i {
-    color: var(--danger);
-    font-size: 1.1rem;
-    filter: drop-shadow(0 2px 4px rgba(239, 68, 68, 0.3));
+    color: white;
+    font-size: 0.9rem;
+    background: linear-gradient(135deg, var(--danger), #dc2626);
+    padding: 8px;
+    border-radius: 50%;
+    box-shadow: 0 3px 10px rgba(239, 68, 68, 0.3);
 }
 
 .price-summary-route .route-point span {
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--text-main);
-    white-space: nowrap;
+    text-align: center;
+    max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .price-summary-route .route-arrow {
-    padding: 0 12px;
-    color: var(--primary);
+    padding: 0 8px;
+    color: var(--gray-400);
     flex-shrink: 0;
     z-index: 1;
-    animation: bounceHorizontal 1.5s ease-in-out infinite;
+    font-size: 0.9rem;
 }
 
-@keyframes bounceHorizontal {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(4px); }
-}
-
-[dir="rtl"] .price-summary-route .route-arrow {
-    animation: bounceHorizontalRTL 1.5s ease-in-out infinite;
-}
-
-@keyframes bounceHorizontalRTL {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(-4px); }
-}
-
-/* Price Details Section - Enhanced */
+/* Price Details Section - New Modern Design */
 .price-summary-details {
-    margin-bottom: 16px;
-    background: rgba(255, 255, 255, 0.6);
-    border-radius: var(--radius);
-    padding: 4px 0;
+    margin-bottom: 0;
+    background: white;
+    border-radius: 14px;
+    padding: 6px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .price-summary-details .price-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 16px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 16px 18px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
     transition: background 0.2s ease;
 }
 
 .price-summary-details .price-row:hover {
-    background: rgba(88, 75, 246, 0.03);
+    background: rgba(88, 75, 246, 0.02);
 }
 
 .price-summary-details .price-row:last-child {
@@ -3865,49 +3862,44 @@ form.submitting button[type="submit"]::before {
 .price-summary-details .price-label {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     color: var(--text-sub);
     font-size: 0.95rem;
     font-weight: 600;
 }
 
 .price-summary-details .price-label i {
-    font-size: 0.9rem;
-    width: 24px;
-    height: 24px;
+    font-size: 0.85rem;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(88, 75, 246, 0.1);
-    border-radius: 6px;
+    background: linear-gradient(135deg, rgba(88, 75, 246, 0.08), rgba(88, 75, 246, 0.12));
+    border-radius: 10px;
     color: var(--primary);
 }
 
 .price-summary-details .price-value {
     font-weight: 800;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     color: var(--text-main);
     font-feature-settings: "tnum";
 }
 
 .price-summary-details .discount-row {
-    background: linear-gradient(135deg, rgba(0, 200, 81, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
-    margin: 8px -16px;
-    padding: 14px 16px !important;
+    background: linear-gradient(135deg, rgba(0, 200, 81, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%);
+    margin: 0;
+    padding: 16px 18px !important;
     border: none !important;
+    border-top: 1px dashed rgba(0, 200, 81, 0.3) !important;
     border-radius: 0;
     position: relative;
     overflow: hidden;
 }
 
 .price-summary-details .discount-row::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: linear-gradient(180deg, var(--success), #16a34a);
+    display: none;
 }
 
 .price-summary-details .discount-row .price-label {
@@ -3916,7 +3908,7 @@ form.submitting button[type="submit"]::before {
 }
 
 .price-summary-details .discount-row .price-label i {
-    background: rgba(0, 200, 81, 0.15);
+    background: linear-gradient(135deg, rgba(0, 200, 81, 0.12), rgba(0, 200, 81, 0.18));
     color: var(--success);
 }
 
@@ -3924,17 +3916,18 @@ form.submitting button[type="submit"]::before {
     color: var(--success);
 }
 
-/* Total Price Section - Enhanced Premium */
+/* Total Price Section - New Modern Design */
 .price-summary-total {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 50%, #3730a3 100%);
-    margin: 0 -20px -20px -20px;
-    padding: 18px 20px;
+    background: linear-gradient(135deg, var(--success) 0%, #16a34a 100%);
+    margin: 18px -22px -22px -22px;
+    padding: 20px 22px;
     color: white;
     position: relative;
     overflow: hidden;
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
 }
 
 .price-summary-total::before {
@@ -3944,38 +3937,32 @@ form.submitting button[type="submit"]::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.08) 50%, transparent 70%);
     background-size: 200% 200%;
-    animation: shimmer 3s infinite;
 }
 
 .price-summary-total .total-label {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 1.05rem;
     position: relative;
     z-index: 1;
 }
 
 .price-summary-total .total-label i {
-    font-size: 1.2rem;
-    opacity: 0.95;
-    animation: coinBounce 2s ease-in-out infinite;
-}
-
-@keyframes coinBounce {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    25% { transform: translateY(-2px) rotate(-5deg); }
-    50% { transform: translateY(-4px) rotate(0deg); }
-    75% { transform: translateY(-2px) rotate(5deg); }
+    font-size: 1.1rem;
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px;
+    border-radius: 10px;
 }
 
 .price-summary-total .total-value {
     font-weight: 900;
-    font-size: 1.5rem;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    font-size: 1.6rem;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     position: relative;
     z-index: 1;
     letter-spacing: 0.5px;
@@ -3988,7 +3975,7 @@ form.submitting button[type="submit"]::before {
 }
 
 [dir="rtl"] .price-summary-route .route-point {
-    flex-direction: row-reverse;
+    flex-direction: column;
 }
 
 [dir="rtl"] .price-summary-details .price-label {
@@ -3999,15 +3986,10 @@ form.submitting button[type="submit"]::before {
     flex-direction: row-reverse;
 }
 
-[dir="rtl"] .price-summary-details .discount-row::before {
-    left: auto;
-    right: 0;
-}
-
-/* Mobile Responsive - Enhanced */
+/* Mobile Responsive - New Design */
 @media (max-width: 576px) {
     .price-summary-box {
-        border-radius: var(--radius-lg);
+        border-radius: 18px;
         margin: 0 -4px;
     }
     
@@ -4016,56 +3998,64 @@ form.submitting button[type="submit"]::before {
         font-size: 0.95rem;
     }
     
+    .price-summary-header i {
+        padding: 8px;
+        font-size: 1.1rem;
+    }
+    
     .price-summary-body {
         padding: 16px;
     }
     
     .price-summary-route {
-        padding: 12px 14px;
-        flex-wrap: wrap;
-        gap: 10px;
+        padding: 14px 12px;
+        flex-direction: row;
+        gap: 6px;
     }
     
     .price-summary-route::before {
-        display: none;
+        left: 30%;
+        right: 30%;
     }
     
     .price-summary-route .route-point {
-        flex: 1 1 100%;
-        justify-content: center;
+        min-width: 80px;
+        padding: 8px 10px;
     }
     
-    .price-summary-route .route-arrow {
-        flex: 1 1 100%;
-        text-align: center;
-        padding: 4px 0;
-        transform: rotate(90deg);
-    }
-    
-    [dir="rtl"] .price-summary-route .route-arrow {
-        transform: rotate(-90deg);
+    .price-summary-route .route-point i {
+        padding: 6px;
+        font-size: 0.8rem;
     }
     
     .price-summary-route .route-point span {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
+        max-width: 80px;
+    }
+    
+    .price-summary-route .route-arrow {
+        padding: 0 4px;
+        font-size: 0.8rem;
     }
     
     .price-summary-total {
-        margin: 0 -16px -16px -16px;
-        padding: 14px 16px;
+        margin: 14px -16px -16px -16px;
+        padding: 16px;
+        border-radius: 0 0 18px 18px;
     }
     
     .price-summary-total .total-value {
-        font-size: 1.3rem;
+        font-size: 1.4rem;
     }
     
     .price-summary-details .price-row {
-        padding: 12px 14px;
+        padding: 14px 16px;
     }
     
-    .price-summary-details .discount-row {
-        margin: 8px -16px;
-        padding: 12px 16px !important;
+    .price-summary-details .price-label i {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
     }
 }
 
@@ -4079,8 +4069,18 @@ form.submitting button[type="submit"]::before {
         padding: 14px;
     }
     
+    .price-summary-route .route-point {
+        min-width: 70px;
+        padding: 6px 8px;
+    }
+    
+    .price-summary-route .route-point span {
+        font-size: 0.75rem;
+        max-width: 70px;
+    }
+    
     .price-summary-total .total-value {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
     }
 }
 
