@@ -710,6 +710,18 @@ function isOrderSummaryVisible() {
     return displayStyle === 'block';
 }
 
+// Helper function to check if any zone is selected (user has started selecting zones)
+function isAnyZoneSelected() {
+    const pickupZone = document.getElementById('pickupZone');
+    const dropoffZone = document.getElementById('dropoffZone');
+    
+    // If either zone has a non-empty value, the user is in the process of selecting zones
+    const pickupSelected = pickupZone && pickupZone.value !== '';
+    const dropoffSelected = dropoffZone && dropoffZone.value !== '';
+    
+    return pickupSelected || dropoffSelected;
+}
+
 // Helper function to check if focus is inside a form
 function isFocusInsideForm(formElement) {
     // If formElement is null, no active element, or body is focused, consider focus as outside
@@ -738,9 +750,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Use a delay to avoid flickering when moving between form fields
         formInteractionTimeout = setTimeout(function() {
-            // Only reset if form still exists, focus moved outside, AND summary is not visible
-            // If the summary is visible, the user is still viewing pricing, so keep the flag set
-            if (isElementInDOM(newOrderForm) && !isFocusInsideForm(newOrderForm) && !isOrderSummaryVisible()) {
+            // Only reset if form still exists, focus moved outside, AND neither summary is visible nor any zone selected
+            // If the summary is visible or any zone is selected, the user is still in the ordering process
+            if (isElementInDOM(newOrderForm) && !isFocusInsideForm(newOrderForm) && !isOrderSummaryVisible() && !isAnyZoneSelected()) {
                 isFillingOrderForm = false;
             }
         }, FORM_BLUR_RESET_DELAY_MS);
@@ -758,9 +770,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Schedule flag reset after a reasonable time
         // This gives the user time to continue filling the form
         formInteractionTimeout = setTimeout(function() {
-            // Only reset if form still exists, focus is outside the form, AND summary is not visible
-            // If the summary is visible, the user is still viewing pricing, so keep the flag set
-            if (isElementInDOM(newOrderForm) && !isFocusInsideForm(newOrderForm) && !isOrderSummaryVisible()) {
+            // Only reset if form still exists, focus is outside the form, AND neither summary is visible nor any zone selected
+            // If the summary is visible or any zone is selected, the user is still in the ordering process
+            if (isElementInDOM(newOrderForm) && !isFocusInsideForm(newOrderForm) && !isOrderSummaryVisible() && !isAnyZoneSelected()) {
                 isFillingOrderForm = false;
             }
         }, ZONE_SELECTION_RESET_DELAY_MS);
