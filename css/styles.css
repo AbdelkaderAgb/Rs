@@ -3508,3 +3508,219 @@ form.submitting button[type="submit"]::before {
     padding: 0;
 }
 
+/* ==========================================
+   PRICE SUMMARY BOX - Redesigned
+   ========================================== */
+.price-summary-box {
+    background: linear-gradient(145deg, #ffffff, #f8fafc);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(88, 75, 246, 0.12),
+                0 4px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(88, 75, 246, 0.15);
+    transition: all 0.3s ease;
+}
+
+.price-summary-box:hover {
+    box-shadow: 0 12px 35px rgba(88, 75, 246, 0.18),
+                0 6px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.price-summary-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.price-summary-header i {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.price-summary-body {
+    padding: 16px;
+}
+
+/* Route Display in Summary */
+.price-summary-route {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, rgba(88, 75, 246, 0.05), rgba(6, 182, 212, 0.05));
+    padding: 12px 14px;
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    border: 1px dashed rgba(88, 75, 246, 0.2);
+}
+
+.price-summary-route .route-point {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.price-summary-route .route-point.pickup i {
+    color: var(--success);
+}
+
+.price-summary-route .route-point.dropoff i {
+    color: var(--danger);
+}
+
+.price-summary-route .route-point span {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.price-summary-route .route-arrow {
+    padding: 0 10px;
+    color: var(--text-sub);
+    flex-shrink: 0;
+}
+
+/* Price Details Section */
+.price-summary-details {
+    margin-bottom: 12px;
+}
+
+.price-summary-details .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.price-summary-details .price-row:last-child {
+    border-bottom: none;
+}
+
+.price-summary-details .price-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-sub);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.price-summary-details .price-label i {
+    font-size: 0.85rem;
+    width: 20px;
+    text-align: center;
+}
+
+.price-summary-details .price-value {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-main);
+}
+
+.price-summary-details .discount-row {
+    background: linear-gradient(135deg, rgba(0, 200, 81, 0.08), rgba(16, 185, 129, 0.08));
+    margin: 8px -16px;
+    padding: 10px 16px !important;
+    border: none !important;
+    border-radius: 0;
+}
+
+.price-summary-details .discount-row .price-label {
+    color: var(--success);
+}
+
+/* Total Price Section */
+.price-summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    margin: 0 -16px -16px -16px;
+    padding: 14px 16px;
+    color: white;
+}
+
+.price-summary-total .total-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.price-summary-total .total-label i {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.price-summary-total .total-value {
+    font-weight: 800;
+    font-size: 1.35rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* RTL Support for Price Summary */
+[dir="rtl"] .price-summary-route {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .price-summary-route .route-point {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .price-summary-details .price-label {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .price-summary-total .total-label {
+    flex-direction: row-reverse;
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+    .price-summary-box {
+        border-radius: var(--radius);
+    }
+    
+    .price-summary-header {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+    }
+    
+    .price-summary-body {
+        padding: 14px;
+    }
+    
+    .price-summary-route {
+        padding: 10px 12px;
+    }
+    
+    .price-summary-route .route-point span {
+        font-size: 0.8rem;
+    }
+    
+    .price-summary-total {
+        margin: 0 -14px -14px -14px;
+        padding: 12px 14px;
+    }
+    
+    .price-summary-total .total-value {
+        font-size: 1.2rem;
+    }
+    
+    .price-summary-details .discount-row {
+        margin: 8px -14px;
+        padding: 10px 14px !important;
+    }
+}
+

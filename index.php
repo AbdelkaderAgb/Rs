@@ -2016,29 +2016,59 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                                 </div>
                             </div>
 
-                            <!-- Order Summary Section -->
-                            <div class="mb-3" id="orderSummaryContainer" style="display: none;">
-                                <div class="alert alert-light border rounded-3 py-3 px-3 mb-0">
-                                    <h6 class="mb-3 fw-bold"><i class="fas fa-receipt me-2 text-primary"></i><?php echo $t['order_summary'] ?? 'Order Summary'; ?></h6>
-                                    
-                                    <!-- Base Delivery Price -->
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span><i class="fas fa-truck me-2 text-muted"></i><?php echo $t['delivery_price'] ?? 'Delivery Price'; ?>:</span>
-                                        <span id="basePriceDisplay" class="fw-bold">0 <?php echo $t['mru'] ?? 'MRU'; ?></span>
+                            <!-- Order Summary Section - Fixed Box Design -->
+                            <div class="mb-4" id="orderSummaryContainer" style="display: none;">
+                                <div class="price-summary-box">
+                                    <div class="price-summary-header">
+                                        <i class="fas fa-receipt"></i>
+                                        <span><?php echo $t['order_summary'] ?? 'Order Summary'; ?></span>
                                     </div>
                                     
-                                    <!-- Discount Row (shown only when promo is applied) -->
-                                    <div class="d-flex justify-content-between align-items-center mb-2" id="discountRow" style="display: none;">
-                                        <span class="text-success"><i class="fas fa-tag me-2"></i><?php echo $t['discount'] ?? 'Discount'; ?>:</span>
-                                        <span id="discountDisplay" class="text-success fw-bold">-0 <?php echo $t['mru'] ?? 'MRU'; ?></span>
-                                    </div>
-                                    
-                                    <hr class="my-2">
-                                    
-                                    <!-- Final Price -->
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="fw-bold"><i class="fas fa-coins me-2 text-warning"></i><?php echo $t['total_price'] ?? 'Total'; ?>:</span>
-                                        <span id="finalPriceDisplay" class="fs-5 fw-bold text-primary">0 <?php echo $t['mru'] ?? 'MRU'; ?></span>
+                                    <div class="price-summary-body">
+                                        <!-- Route Display -->
+                                        <div class="price-summary-route">
+                                            <div class="route-point pickup">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                <span id="summaryPickupZone">-</span>
+                                            </div>
+                                            <div class="route-arrow">
+                                                <i class="fas fa-arrow-<?php echo $dir == 'rtl' ? 'left' : 'right'; ?>"></i>
+                                            </div>
+                                            <div class="route-point dropoff">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                <span id="summaryDropoffZone">-</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Price Details -->
+                                        <div class="price-summary-details">
+                                            <!-- Delivery Price Row -->
+                                            <div class="price-row">
+                                                <span class="price-label">
+                                                    <i class="fas fa-truck"></i>
+                                                    <?php echo $t['delivery_price'] ?? 'Delivery Price'; ?>
+                                                </span>
+                                                <span id="basePriceDisplay" class="price-value">0 <?php echo $t['mru'] ?? 'MRU'; ?></span>
+                                            </div>
+                                            
+                                            <!-- Discount Row (shown only when promo is applied) -->
+                                            <div class="price-row discount-row" id="discountRow" style="display: none;">
+                                                <span class="price-label text-success">
+                                                    <i class="fas fa-tag"></i>
+                                                    <?php echo $t['discount'] ?? 'Discount'; ?>
+                                                </span>
+                                                <span id="discountDisplay" class="price-value text-success">-0 <?php echo $t['mru'] ?? 'MRU'; ?></span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Total Price - Highlighted -->
+                                        <div class="price-summary-total">
+                                            <span class="total-label">
+                                                <i class="fas fa-coins"></i>
+                                                <?php echo $t['total_price'] ?? 'Total'; ?>
+                                            </span>
+                                            <span id="finalPriceDisplay" class="total-value">0 <?php echo $t['mru'] ?? 'MRU'; ?></span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2859,12 +2889,17 @@ let currentPromoValid = false;
 
 // Calculate delivery price based on selected zones
 function calculateDeliveryPrice() {
-    const pickupZone = document.getElementById('pickupZone')?.value;
+    const pickupZoneSelect = document.getElementById('pickupZone');
     const dropoffZoneSelect = document.getElementById('dropoffZone');
+    const pickupZone = pickupZoneSelect?.value;
     const dropoffZone = dropoffZoneSelect?.value;
     const summaryContainer = document.getElementById('orderSummaryContainer');
     const basePriceDisplay = document.getElementById('basePriceDisplay');
     const finalPriceDisplay = document.getElementById('finalPriceDisplay');
+    
+    // Summary route display elements
+    const summaryPickupZone = document.getElementById('summaryPickupZone');
+    const summaryDropoffZone = document.getElementById('summaryDropoffZone');
 
     if (!summaryContainer || !basePriceDisplay || !finalPriceDisplay) return;
 
@@ -2896,6 +2931,14 @@ function calculateDeliveryPrice() {
             }
         }
         currentBasePrice = price;
+        
+        // Update the route display in summary
+        if (summaryPickupZone && pickupZoneSelect) {
+            summaryPickupZone.textContent = pickupZoneSelect.options[pickupZoneSelect.selectedIndex].text;
+        }
+        if (summaryDropoffZone && dropoffZoneSelect) {
+            summaryDropoffZone.textContent = dropoffZoneSelect.options[dropoffZoneSelect.selectedIndex].text;
+        }
         
         // Update the display
         basePriceDisplay.textContent = price + ' ' + AppTranslations.mru;
@@ -2947,6 +2990,8 @@ function clearOrderForm() {
     const summaryContainer = document.getElementById('orderSummaryContainer');
     const promoInput = document.getElementById('promoCodeInput');
     const promoFeedback = document.getElementById('promoFeedback');
+    const summaryPickupZone = document.getElementById('summaryPickupZone');
+    const summaryDropoffZone = document.getElementById('summaryDropoffZone');
     
     // Reset form if it exists
     if (form) {
@@ -2965,6 +3010,14 @@ function clearOrderForm() {
     // Hide order summary
     if (summaryContainer) {
         summaryContainer.style.display = 'none';
+    }
+    
+    // Reset summary route display
+    if (summaryPickupZone) {
+        summaryPickupZone.textContent = '-';
+    }
+    if (summaryDropoffZone) {
+        summaryDropoffZone.textContent = '-';
     }
     
     // Reset pricing state
