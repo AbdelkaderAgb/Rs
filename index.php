@@ -2933,10 +2933,10 @@ function calculateDeliveryPrice() {
         currentBasePrice = price;
         
         // Update the route display in summary
-        if (summaryPickupZone && pickupZoneSelect) {
+        if (summaryPickupZone && pickupZoneSelect && pickupZoneSelect.selectedIndex >= 0) {
             summaryPickupZone.textContent = pickupZoneSelect.options[pickupZoneSelect.selectedIndex].text;
         }
-        if (summaryDropoffZone && dropoffZoneSelect) {
+        if (summaryDropoffZone && dropoffZoneSelect && dropoffZoneSelect.selectedIndex >= 0) {
             summaryDropoffZone.textContent = dropoffZoneSelect.options[dropoffZoneSelect.selectedIndex].text;
         }
         
