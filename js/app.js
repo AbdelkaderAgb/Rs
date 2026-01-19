@@ -716,8 +716,9 @@ function isAnyZoneSelected() {
     const dropoffZone = document.getElementById('dropoffZone');
     
     // If either zone has a non-empty value, the user is in the process of selecting zones
-    const pickupSelected = pickupZone && pickupZone.value !== '';
-    const dropoffSelected = dropoffZone && dropoffZone.value !== '';
+    // Using optional chaining for consistency with calculateDeliveryPrice() function
+    const pickupSelected = pickupZone?.value !== '' && pickupZone?.value !== undefined;
+    const dropoffSelected = dropoffZone?.value !== '' && dropoffZone?.value !== undefined;
     
     return pickupSelected || dropoffSelected;
 }
