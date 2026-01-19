@@ -2907,10 +2907,13 @@ function calculateDeliveryPrice() {
     if (dropoffZoneSelect) {
         if (pickupZone) {
             // Enable dropoff zone when pickup is selected
+            // Use both property and attribute methods for maximum browser compatibility
             dropoffZoneSelect.disabled = false;
+            dropoffZoneSelect.removeAttribute('disabled');
         } else {
             // Disable dropoff zone when no pickup selected
             dropoffZoneSelect.disabled = true;
+            dropoffZoneSelect.setAttribute('disabled', 'disabled');
             // Also reset dropoff zone selection when pickup is cleared
             dropoffZoneSelect.value = '';
         }
@@ -3005,7 +3008,9 @@ function clearOrderForm() {
     }
     if (dropoffZone) {
         dropoffZone.value = '';
-        dropoffZone.disabled = true; // Re-freeze dropoff zone
+        // Re-freeze dropoff zone using both property and attribute for consistency
+        dropoffZone.disabled = true;
+        dropoffZone.setAttribute('disabled', 'disabled');
     }
     
     // Hide order summary
@@ -3190,12 +3195,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (pickupZoneSelect && dropoffZoneSelect) {
         // Ensure dropoff zone is initially disabled if no pickup zone is selected
+        // Use both property and attribute for maximum browser compatibility
         if (!pickupZoneSelect.value) {
             dropoffZoneSelect.disabled = true;
+            dropoffZoneSelect.setAttribute('disabled', 'disabled');
             dropoffZoneSelect.value = '';
         } else {
             // If pickup zone has a value (e.g., from form persistence), enable dropoff zone
             dropoffZoneSelect.disabled = false;
+            dropoffZoneSelect.removeAttribute('disabled');
         }
 
         // Add explicit event listener for pickup zone changes (in addition to inline onchange)
@@ -3203,8 +3211,10 @@ document.addEventListener('DOMContentLoaded', function() {
         pickupZoneSelect.addEventListener('change', function() {
             if (this.value) {
                 dropoffZoneSelect.disabled = false;
+                dropoffZoneSelect.removeAttribute('disabled');
             } else {
                 dropoffZoneSelect.disabled = true;
+                dropoffZoneSelect.setAttribute('disabled', 'disabled');
                 dropoffZoneSelect.value = '';
             }
             // Also call calculateDeliveryPrice to update pricing
