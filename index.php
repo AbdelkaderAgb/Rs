@@ -2907,10 +2907,13 @@ function calculateDeliveryPrice() {
     if (dropoffZoneSelect) {
         if (pickupZone) {
             // Enable dropoff zone when pickup is selected
+            // Use both property and attribute methods for maximum browser compatibility
             dropoffZoneSelect.disabled = false;
+            dropoffZoneSelect.removeAttribute('disabled');
         } else {
             // Disable dropoff zone when no pickup selected
             dropoffZoneSelect.disabled = true;
+            dropoffZoneSelect.setAttribute('disabled', 'disabled');
             // Also reset dropoff zone selection when pickup is cleared
             dropoffZoneSelect.value = '';
         }
@@ -3005,7 +3008,9 @@ function clearOrderForm() {
     }
     if (dropoffZone) {
         dropoffZone.value = '';
-        dropoffZone.disabled = true; // Re-freeze dropoff zone
+        // Re-freeze dropoff zone using both property and attribute for consistency
+        dropoffZone.disabled = true;
+        dropoffZone.setAttribute('disabled', 'disabled');
     }
     
     // Hide order summary
@@ -3182,6 +3187,31 @@ window.showDriverDetails = function(driver) {
     var modal = new bootstrap.Modal(document.getElementById('driverDetailsModal'));
     modal.show();
 };
+
+// Initialize zone selection handlers on DOM load
+// This ensures the event handlers are properly attached even if inline handlers fail
+(function() {
+    const pickupZoneEl = document.getElementById('pickupZone');
+    const dropoffZoneEl = document.getElementById('dropoffZone');
+
+    if (pickupZoneEl) {
+        // Add event listener as backup to inline onchange
+        pickupZoneEl.addEventListener('change', function() {
+            calculateDeliveryPrice();
+        });
+
+        // Initialize dropoff zone state based on current pickup value
+        if (dropoffZoneEl) {
+            if (pickupZoneEl.value) {
+                dropoffZoneEl.disabled = false;
+                dropoffZoneEl.removeAttribute('disabled');
+            } else {
+                dropoffZoneEl.disabled = true;
+                dropoffZoneEl.setAttribute('disabled', 'disabled');
+            }
+        }
+    }
+})();
 
 <?php if(isset($_SESSION['user']) && !isset($_GET['settings'])): ?>
 // Initialize real-time polling
