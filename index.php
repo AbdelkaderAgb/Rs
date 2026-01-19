@@ -2904,18 +2904,27 @@ function calculateDeliveryPrice() {
     // Enable/disable dropoff zone based on pickup zone selection
     // Dropoff zone is frozen until pickup zone is selected
     // This must happen BEFORE the early return to ensure the dropoff zone is always enabled/disabled correctly
+    // Use helper functions defined in DOMContentLoaded for consistency and maximum browser compatibility
     if (dropoffZoneSelect) {
         if (pickupZone) {
             // Enable dropoff zone when pickup is selected
-            // Use both property and attribute methods for maximum browser compatibility
-            dropoffZoneSelect.disabled = false;
-            dropoffZoneSelect.removeAttribute('disabled');
+            if (typeof enableDropoffZone === 'function') {
+                enableDropoffZone(dropoffZoneSelect);
+            } else {
+                // Fallback if helper not yet defined
+                dropoffZoneSelect.disabled = false;
+                dropoffZoneSelect.removeAttribute('disabled');
+            }
         } else {
             // Disable dropoff zone when no pickup selected
-            dropoffZoneSelect.disabled = true;
-            dropoffZoneSelect.setAttribute('disabled', 'disabled');
-            // Also reset dropoff zone selection when pickup is cleared
-            dropoffZoneSelect.value = '';
+            if (typeof disableDropoffZone === 'function') {
+                disableDropoffZone(dropoffZoneSelect);
+            } else {
+                // Fallback if helper not yet defined
+                dropoffZoneSelect.disabled = true;
+                dropoffZoneSelect.setAttribute('disabled', 'disabled');
+                dropoffZoneSelect.value = '';
+            }
         }
     }
 
@@ -3188,6 +3197,50 @@ window.showDriverDetails = function(driver) {
     modal.show();
 };
 
+// Helper function to enable the dropoff zone
+function enableDropoffZone(dropoffZoneSelect) {
+    if (dropoffZoneSelect) {
+        dropoffZoneSelect.disabled = false;
+        dropoffZoneSelect.removeAttribute('disabled');
+        // Force style recalculation for cross-browser compatibility
+        dropoffZoneSelect.style.pointerEvents = 'auto';
+        dropoffZoneSelect.style.opacity = '1';
+        // Trigger reflow to ensure the change is visible
+        void dropoffZoneSelect.offsetHeight;
+    }
+}
+
+// Helper function to disable the dropoff zone
+function disableDropoffZone(dropoffZoneSelect) {
+    if (dropoffZoneSelect) {
+        dropoffZoneSelect.disabled = true;
+        dropoffZoneSelect.setAttribute('disabled', 'disabled');
+        dropoffZoneSelect.value = '';
+        dropoffZoneSelect.style.pointerEvents = '';
+        dropoffZoneSelect.style.opacity = '';
+    }
+}
+
+// Function to sync dropoff zone state with pickup zone value
+function syncDropoffZoneState() {
+    const pickupZoneSelect = document.getElementById('pickupZone');
+    const dropoffZoneSelect = document.getElementById('dropoffZone');
+
+    if (pickupZoneSelect && dropoffZoneSelect) {
+        if (pickupZoneSelect.value) {
+            // Pickup zone has a value, ensure dropoff is enabled
+            if (dropoffZoneSelect.disabled) {
+                enableDropoffZone(dropoffZoneSelect);
+            }
+        } else {
+            // No pickup zone selected, ensure dropoff is disabled
+            if (!dropoffZoneSelect.disabled) {
+                disableDropoffZone(dropoffZoneSelect);
+            }
+        }
+    }
+}
+
 // Initialize zone selection behavior on page load
 document.addEventListener('DOMContentLoaded', function() {
     const pickupZoneSelect = document.getElementById('pickupZone');
@@ -3197,34 +3250,57 @@ document.addEventListener('DOMContentLoaded', function() {
         // Ensure dropoff zone is initially disabled if no pickup zone is selected
         // Use both property and attribute for maximum browser compatibility
         if (!pickupZoneSelect.value) {
-            dropoffZoneSelect.disabled = true;
-            dropoffZoneSelect.setAttribute('disabled', 'disabled');
-            dropoffZoneSelect.value = '';
+            disableDropoffZone(dropoffZoneSelect);
         } else {
             // If pickup zone has a value (e.g., from form persistence), enable dropoff zone
-            dropoffZoneSelect.disabled = false;
-            dropoffZoneSelect.removeAttribute('disabled');
+            enableDropoffZone(dropoffZoneSelect);
         }
 
-        // Add explicit event listener for pickup zone changes (in addition to inline onchange)
-        // This ensures the handler works even if inline handlers are blocked
-        pickupZoneSelect.addEventListener('change', function() {
-            if (this.value) {
-                dropoffZoneSelect.disabled = false;
-                dropoffZoneSelect.removeAttribute('disabled');
+        // Handler function for pickup zone changes
+        function handlePickupZoneChange() {
+            if (pickupZoneSelect.value) {
+                enableDropoffZone(dropoffZoneSelect);
             } else {
-                dropoffZoneSelect.disabled = true;
-                dropoffZoneSelect.setAttribute('disabled', 'disabled');
-                dropoffZoneSelect.value = '';
+                disableDropoffZone(dropoffZoneSelect);
             }
             // Also call calculateDeliveryPrice to update pricing
-            calculateDeliveryPrice();
+            if (typeof calculateDeliveryPrice === 'function') {
+                calculateDeliveryPrice();
+            }
+        }
+
+        // Add multiple event listeners to ensure we catch the change in all scenarios
+        // Different browsers/devices may fire different events
+        pickupZoneSelect.addEventListener('change', handlePickupZoneChange);
+        pickupZoneSelect.addEventListener('input', handlePickupZoneChange);
+
+        // For mobile Safari and some touch devices, also listen for blur/focusout
+        pickupZoneSelect.addEventListener('blur', function() {
+            // Use setTimeout to ensure the value has been updated
+            setTimeout(handlePickupZoneChange, 50);
         });
 
         // Add event listener for dropoff zone to update pricing when changed
         dropoffZoneSelect.addEventListener('change', function() {
-            calculateDeliveryPrice();
+            if (typeof calculateDeliveryPrice === 'function') {
+                calculateDeliveryPrice();
+            }
         });
+
+        // Failsafe: periodically check and sync the state
+        // This catches any edge cases where events might not fire correctly
+        let syncInterval = setInterval(function() {
+            // Only run if the form exists (stop if navigated away)
+            if (!document.getElementById('pickupZone')) {
+                clearInterval(syncInterval);
+                return;
+            }
+            syncDropoffZoneState();
+        }, 500);
+
+        // Also sync after a short delay to catch any initial race conditions
+        setTimeout(syncDropoffZoneState, 100);
+        setTimeout(syncDropoffZoneState, 300);
     }
 });
 
