@@ -3183,6 +3183,41 @@ window.showDriverDetails = function(driver) {
     modal.show();
 };
 
+// Initialize zone selection behavior on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const pickupZoneSelect = document.getElementById('pickupZone');
+    const dropoffZoneSelect = document.getElementById('dropoffZone');
+
+    if (pickupZoneSelect && dropoffZoneSelect) {
+        // Ensure dropoff zone is initially disabled if no pickup zone is selected
+        if (!pickupZoneSelect.value) {
+            dropoffZoneSelect.disabled = true;
+            dropoffZoneSelect.value = '';
+        } else {
+            // If pickup zone has a value (e.g., from form persistence), enable dropoff zone
+            dropoffZoneSelect.disabled = false;
+        }
+
+        // Add explicit event listener for pickup zone changes (in addition to inline onchange)
+        // This ensures the handler works even if inline handlers are blocked
+        pickupZoneSelect.addEventListener('change', function() {
+            if (this.value) {
+                dropoffZoneSelect.disabled = false;
+            } else {
+                dropoffZoneSelect.disabled = true;
+                dropoffZoneSelect.value = '';
+            }
+            // Also call calculateDeliveryPrice to update pricing
+            calculateDeliveryPrice();
+        });
+
+        // Add event listener for dropoff zone to update pricing when changed
+        dropoffZoneSelect.addEventListener('change', function() {
+            calculateDeliveryPrice();
+        });
+    }
+});
+
 <?php if(isset($_SESSION['user']) && !isset($_GET['settings'])): ?>
 // Initialize real-time polling
 initRealtimePolling(AppConfig.userRole, AppTranslations);
