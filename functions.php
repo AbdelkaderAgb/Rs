@@ -826,6 +826,12 @@ $text = [
         'order_summary' => 'ملخص الطلب',
         'discount' => 'الخصم',
         'total_price' => 'الإجمالي',
+        
+        // Order Confirmation Modal
+        'confirm_order' => 'تأكيد الطلب',
+        'delivery_route' => 'مسار التوصيل',
+        'confirm_order_message' => 'يرجى تأكيد سعر التوصيل قبل إرسال طلبك.',
+        'confirm_and_submit' => 'تأكيد وإرسال',
 
         // Working Zones (Driver)
         'working_zones' => 'مناطق العمل',
@@ -1299,6 +1305,12 @@ $text = [
         'order_summary' => 'Résumé de la commande',
         'discount' => 'Réduction',
         'total_price' => 'Total',
+        
+        // Order Confirmation Modal
+        'confirm_order' => 'Confirmer la commande',
+        'delivery_route' => 'Itinéraire de livraison',
+        'confirm_order_message' => 'Veuillez confirmer le prix de livraison avant de soumettre votre commande.',
+        'confirm_and_submit' => 'Confirmer et soumettre',
 
         // Working Zones (Driver)
         'working_zones' => 'Zones de travail',
