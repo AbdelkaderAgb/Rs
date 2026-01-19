@@ -393,7 +393,7 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" name="working_zones[]" value="<?php echo e($key); ?>" id="zone_<?php echo e($key); ?>" <?php echo in_array($key, $userWorkingZones) ? 'checked' : ''; ?>>
                                             <label class="form-check-label" for="zone_<?php echo e($key); ?>">
-                                                <?php echo ($lang == 'ar') ? $name : (isset($zones_fr[$key]) ? $zones_fr[$key] : $key); ?>
+                                                <?php echo ($lang == 'ar') ? $name : (($lang == 'fr' && isset($zones_fr[$key])) ? $zones_fr[$key] : $key); ?>
                                             </label>
                                         </div>
                                         <?php endforeach; ?>
@@ -1587,7 +1587,7 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                                         <select name="pickup_zone" class="form-select" required>
                                             <option value=""><?php echo $t['select_zone'] ?? 'Select zone'; ?></option>
                                             <?php foreach($zones as $key => $name): ?>
-                                            <option value="<?php echo e($key); ?>"><?php echo ($lang == 'ar') ? $name : (isset($zones_fr[$key]) ? $zones_fr[$key] : $key); ?></option>
+                                            <option value="<?php echo e($key); ?>"><?php echo ($lang == 'ar') ? $name : (($lang == 'fr' && isset($zones_fr[$key])) ? $zones_fr[$key] : $key); ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
@@ -1596,7 +1596,7 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                                         <select name="dropoff_zone" class="form-select" required>
                                             <option value=""><?php echo $t['select_zone'] ?? 'Select zone'; ?></option>
                                             <?php foreach($zones as $key => $name): ?>
-                                            <option value="<?php echo e($key); ?>"><?php echo ($lang == 'ar') ? $name : (isset($zones_fr[$key]) ? $zones_fr[$key] : $key); ?></option>
+                                            <option value="<?php echo e($key); ?>"><?php echo ($lang == 'ar') ? $name : (($lang == 'fr' && isset($zones_fr[$key])) ? $zones_fr[$key] : $key); ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
@@ -1999,7 +1999,7 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                                     <select name="pickup_zone" id="pickupZone" class="form-select" required onchange="calculateDeliveryPrice()">
                                         <option value=""><?php echo $t['select_zone'] ?? 'Select zone'; ?></option>
                                         <?php foreach($zones as $key => $name): ?>
-                                        <option value="<?php echo e($key); ?>"><?php echo ($lang == 'ar') ? $name : (isset($zones_fr[$key]) ? $zones_fr[$key] : $key); ?></option>
+                                        <option value="<?php echo e($key); ?>"><?php echo ($lang == 'ar') ? $name : (($lang == 'fr' && isset($zones_fr[$key])) ? $zones_fr[$key] : $key); ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
@@ -2010,7 +2010,7 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                                     <select name="dropoff_zone" id="dropoffZone" class="form-select" required onchange="calculateDeliveryPrice()" disabled>
                                         <option value=""><?php echo $t['select_zone'] ?? 'Select zone'; ?></option>
                                         <?php foreach($zones as $key => $name): ?>
-                                        <option value="<?php echo e($key); ?>"><?php echo ($lang == 'ar') ? $name : (isset($zones_fr[$key]) ? $zones_fr[$key] : $key); ?></option>
+                                        <option value="<?php echo e($key); ?>"><?php echo ($lang == 'ar') ? $name : (($lang == 'fr' && isset($zones_fr[$key])) ? $zones_fr[$key] : $key); ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
