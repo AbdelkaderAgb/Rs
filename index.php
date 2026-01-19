@@ -2007,7 +2007,7 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                                     <label class="form-label small text-muted mb-1">
                                         <i class="fas fa-map-marker-alt me-1 text-danger"></i><?php echo $t['dropoff_zone'] ?? 'Dropoff Zone'; ?>
                                     </label>
-                                    <select name="dropoff_zone" id="dropoffZone" class="form-select" required onchange="calculateDeliveryPrice()">
+                                    <select name="dropoff_zone" id="dropoffZone" class="form-select" required onchange="calculateDeliveryPrice()" disabled>
                                         <option value=""><?php echo $t['select_zone'] ?? 'Select zone'; ?></option>
                                         <?php foreach($zones as $key => $name): ?>
                                         <option value="<?php echo e($key); ?>"><?php echo ($lang == 'ar') ? $name : $key; ?></option>
@@ -2799,12 +2799,27 @@ let currentPromoValid = false;
 // Calculate delivery price based on selected zones
 function calculateDeliveryPrice() {
     const pickupZone = document.getElementById('pickupZone')?.value;
-    const dropoffZone = document.getElementById('dropoffZone')?.value;
+    const dropoffZoneSelect = document.getElementById('dropoffZone');
+    const dropoffZone = dropoffZoneSelect?.value;
     const summaryContainer = document.getElementById('orderSummaryContainer');
     const basePriceDisplay = document.getElementById('basePriceDisplay');
     const finalPriceDisplay = document.getElementById('finalPriceDisplay');
 
     if (!summaryContainer || !basePriceDisplay || !finalPriceDisplay) return;
+
+    // Enable/disable dropoff zone based on pickup zone selection
+    // Dropoff zone is frozen until pickup zone is selected
+    if (dropoffZoneSelect) {
+        if (pickupZone) {
+            // Enable dropoff zone when pickup is selected
+            dropoffZoneSelect.disabled = false;
+        } else {
+            // Disable dropoff zone when no pickup selected
+            dropoffZoneSelect.disabled = true;
+            // Also reset dropoff zone selection when pickup is cleared
+            dropoffZoneSelect.value = '';
+        }
+    }
 
     // Pricing constants for fallback when no routes found
     const DEFAULT_PRICE = 150;
@@ -2861,6 +2876,50 @@ function updateOrderSummary() {
     
     // Update final price
     finalPriceDisplay.textContent = finalPrice + ' ' + AppTranslations.mru;
+}
+
+// Clear order form and reset zone states
+function clearOrderForm() {
+    const form = document.getElementById('newOrderForm');
+    const pickupZone = document.getElementById('pickupZone');
+    const dropoffZone = document.getElementById('dropoffZone');
+    const summaryContainer = document.getElementById('orderSummaryContainer');
+    const promoInput = document.getElementById('promoCodeInput');
+    const promoFeedback = document.getElementById('promoFeedback');
+    
+    // Reset form if it exists
+    if (form) {
+        form.reset();
+    }
+    
+    // Reset zone selections
+    if (pickupZone) {
+        pickupZone.value = '';
+    }
+    if (dropoffZone) {
+        dropoffZone.value = '';
+        dropoffZone.disabled = true; // Re-freeze dropoff zone
+    }
+    
+    // Hide order summary
+    if (summaryContainer) {
+        summaryContainer.style.display = 'none';
+    }
+    
+    // Reset pricing state
+    currentBasePrice = 0;
+    currentDiscount = 0;
+    currentPromoValid = false;
+    
+    // Clear promo code state
+    if (promoInput) {
+        promoInput.value = '';
+        promoInput.classList.remove('is-valid', 'is-invalid');
+    }
+    if (promoFeedback) {
+        promoFeedback.innerHTML = '';
+        promoFeedback.className = 'text-muted';
+    }
 }
 
 window.showOrderTracking = function(order) {
