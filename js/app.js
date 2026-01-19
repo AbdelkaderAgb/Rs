@@ -702,12 +702,12 @@ function isOrderSummaryVisible() {
     
     // Check inline style.display since that's how visibility is controlled in calculateDeliveryPrice()
     // The element starts with "display: none;" in HTML (line 2020 in index.php)
-    // calculateDeliveryPrice() sets it to 'block' when visible or 'none' when hidden
+    // calculateDeliveryPrice() explicitly sets it to 'block' when visible or 'none' when hidden
     const displayStyle = orderSummary.style.display;
     
-    // Visible if display is 'block' (explicitly shown) or empty string (no inline style, would use CSS default)
-    // Not visible if display is 'none' (explicitly hidden)
-    return displayStyle !== 'none';
+    // Explicitly check for 'block' to be safe
+    // (though in practice, the style is always set to either 'block' or 'none')
+    return displayStyle === 'block';
 }
 
 // Helper function to check if focus is inside a form
