@@ -787,6 +787,47 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Track pending reload timeout to prevent multiple schedules
+let pendingReloadTimeout = null;
+
+/**
+ * Helper function to check if user is actively filling out the order form.
+ * Returns true if ANY of these conditions are met:
+ * 1. isFillingOrderForm flag is set (user focused on form)
+ * 2. Order summary is currently visible (user has selected both zones)
+ * 3. Any zone is selected (user is in the process of selecting zones)
+ */
+function isUserFillingOrderForm() {
+    return isFillingOrderForm || isOrderSummaryVisible() || isAnyZoneSelected();
+}
+
+/**
+ * Schedule a page reload, but re-check conditions before actually reloading.
+ * This prevents the order summary from disappearing if the user starts filling
+ * the form after the reload was scheduled but before it fires.
+ */
+function schedulePageReloadIfSafe() {
+    // First check: don't even schedule if user is filling the form
+    if (isUserFillingOrderForm()) {
+        return;
+    }
+    
+    // Don't schedule multiple reloads
+    if (pendingReloadTimeout !== null) {
+        return;
+    }
+    
+    pendingReloadTimeout = setTimeout(function() {
+        pendingReloadTimeout = null;
+        
+        // Second check: verify user is STILL not filling the form
+        // This is the key fix - we re-check right before reloading
+        if (!isUserFillingOrderForm()) {
+            location.reload();
+        }
+    }, 2000);
+}
+
 function initRealtimePolling(userRole, translations) {
     let lastCheck = Math.floor(Date.now() / 1000);
 
@@ -824,16 +865,10 @@ function initRealtimePolling(userRole, translations) {
                             );
                         });
 
-                        // Only refresh page if user is not actively filling out the order form
+                        // Schedule a page reload, but re-check conditions before actually reloading
                         // This prevents the order summary from disappearing while the user is selecting zones
-                        // Check multiple conditions to ensure we don't interrupt the user:
-                        // 1. isFillingOrderForm flag (set on form focus/interaction)
-                        // 2. isOrderSummaryVisible() - order summary is displayed
-                        // 3. isAnyZoneSelected() - user has selected at least one zone
-                        const userIsFillingForm = isFillingOrderForm || isOrderSummaryVisible() || isAnyZoneSelected();
-                        if (!userIsFillingForm) {
-                            setTimeout(() => location.reload(), 2000);
-                        }
+                        // The check is done both now and again when the timeout fires
+                        schedulePageReloadIfSafe();
                     }
                 }
             })
