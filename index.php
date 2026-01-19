@@ -2064,7 +2064,7 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                                 <small id="promoFeedback" class="text-muted"></small>
                             </div>
 
-                            <button type="submit" name="add_order" class="slider-btn-container w-100">
+                            <button type="button" class="slider-btn-container w-100" onclick="showOrderConfirmation()">
                                 <div class="slider-thumb"><i class="fa-solid fa-paper-plane"></i></div>
                                 <div class="slider-text"><?php echo $t['btn_publish']; ?></div>
                             </button>
@@ -2732,6 +2732,62 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
             </div>
         </div>
 
+        <!-- Order Confirmation Modal -->
+        <div class="modal fade" id="orderConfirmModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="fas fa-receipt me-2"></i><?php echo $t['confirm_order'] ?? 'Confirm Order'; ?></h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <!-- Order Summary in Confirmation -->
+                        <div class="alert alert-light border rounded-3 py-3 px-3 mb-3">
+                            <h6 class="mb-3 fw-bold"><i class="fas fa-map-marker-alt me-2 text-primary"></i><?php echo $t['delivery_route'] ?? 'Delivery Route'; ?></h6>
+                            
+                            <!-- Route Display -->
+                            <div class="d-flex align-items-center justify-content-between p-2 bg-white rounded mb-3">
+                                <div class="text-center flex-grow-1">
+                                    <i class="fas fa-map-marker-alt text-success"></i>
+                                    <span class="small fw-bold" id="confirmPickupZone">-</span>
+                                </div>
+                                <div class="px-2">
+                                    <i class="fas fa-arrow-<?php echo $dir == 'rtl' ? 'left' : 'right'; ?> text-muted"></i>
+                                </div>
+                                <div class="text-center flex-grow-1">
+                                    <i class="fas fa-map-marker-alt text-danger"></i>
+                                    <span class="small fw-bold" id="confirmDropoffZone">-</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Price Display -->
+                            <div class="text-center p-3 rounded-3" style="background: linear-gradient(135deg, rgba(88, 75, 246, 0.1), rgba(6, 182, 212, 0.1));">
+                                <small class="text-muted d-block mb-1"><?php echo $t['delivery_price'] ?? 'Delivery Price'; ?></small>
+                                <h3 class="mb-0 fw-bold text-primary" id="confirmDeliveryPrice">0 <?php echo $t['mru'] ?? 'MRU'; ?></h3>
+                                <div id="confirmDiscountInfo" style="display: none;">
+                                    <small class="text-success"><i class="fas fa-tag me-1"></i><span id="confirmDiscountText"></span></small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Confirmation Message -->
+                        <p class="text-center text-muted small mb-0">
+                            <i class="fas fa-info-circle me-1"></i>
+                            <?php echo $t['confirm_order_message'] ?? 'Please confirm the delivery price before submitting your order.'; ?>
+                        </p>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i><?php echo $t['cancel'] ?? 'Cancel'; ?>
+                        </button>
+                        <button type="button" class="btn btn-primary rounded-pill px-4" onclick="submitOrderForm()">
+                            <i class="fas fa-check me-1"></i><?php echo $t['confirm_and_submit'] ?? 'Confirm & Submit'; ?>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <?php endif; ?>
     </div>
 
@@ -2782,7 +2838,8 @@ const AppTranslations = {
     driver_assigned: '<?php echo $t['driver_assigned'] ?? 'Driver assigned'; ?>',
 
     // Zone translations
-    mru: '<?php echo $t['mru'] ?? 'MRU'; ?>'
+    mru: '<?php echo $t['mru'] ?? 'MRU'; ?>',
+    discount: '<?php echo $t['discount'] ?? 'discount'; ?>'
 };
 
 const AppConfig = {
@@ -2923,6 +2980,75 @@ function clearOrderForm() {
     if (promoFeedback) {
         promoFeedback.innerHTML = '';
         promoFeedback.className = 'text-muted';
+    }
+}
+
+// Show order confirmation modal with delivery price
+function showOrderConfirmation() {
+    const form = document.getElementById('newOrderForm');
+    const pickupZone = document.getElementById('pickupZone');
+    const dropoffZone = document.getElementById('dropoffZone');
+    
+    // Validate form fields first
+    if (!form || !form.checkValidity()) {
+        // Show validation errors
+        if (form) {
+            form.reportValidity();
+        }
+        return;
+    }
+    
+    // Ensure both zones are selected
+    if (!pickupZone?.value || !dropoffZone?.value) {
+        if (form) {
+            form.reportValidity();
+        }
+        return;
+    }
+    
+    // Get zone names for display
+    const pickupZoneText = pickupZone.options[pickupZone.selectedIndex].text;
+    const dropoffZoneText = dropoffZone.options[dropoffZone.selectedIndex].text;
+    
+    // Calculate final price
+    let finalPrice = currentBasePrice - currentDiscount;
+    if (finalPrice < 0) finalPrice = 0;
+    
+    // Update confirmation modal content
+    document.getElementById('confirmPickupZone').textContent = pickupZoneText;
+    document.getElementById('confirmDropoffZone').textContent = dropoffZoneText;
+    document.getElementById('confirmDeliveryPrice').textContent = finalPrice + ' ' + AppTranslations.mru;
+    
+    // Show discount info if applicable
+    const discountInfo = document.getElementById('confirmDiscountInfo');
+    const discountText = document.getElementById('confirmDiscountText');
+    if (currentDiscount > 0 && currentPromoValid) {
+        discountInfo.style.display = 'block';
+        discountText.textContent = '-' + currentDiscount + ' ' + AppTranslations.mru + ' ' + (AppTranslations.discount || 'discount');
+    } else {
+        discountInfo.style.display = 'none';
+    }
+    
+    // Show the confirmation modal
+    var modal = new bootstrap.Modal(document.getElementById('orderConfirmModal'));
+    modal.show();
+}
+
+// Submit the order form after confirmation
+function submitOrderForm() {
+    const form = document.getElementById('newOrderForm');
+    if (form) {
+        // Close the confirmation modal
+        var modal = bootstrap.Modal.getInstance(document.getElementById('orderConfirmModal'));
+        if (modal) {
+            modal.hide();
+        }
+        
+        // Show loading overlay
+        showLoadingOverlay();
+        
+        // Submit the form
+        form.submit();
     }
 }
 
