@@ -33,6 +33,17 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.<?php echo $lang=='ar'?'rtl.':''; ?>min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Force-enable dropoff zone when pickup is selected */
+        #dropoffZone.zone-enabled,
+        #dropoffZone.zone-enabled:disabled {
+            pointer-events: auto !important;
+            opacity: 1 !important;
+            background-color: #fff !important;
+            cursor: pointer !important;
+            color: inherit !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -1996,7 +2007,7 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                                     <label class="form-label small text-muted mb-1">
                                         <i class="fas fa-map-marker-alt me-1 text-success"></i><?php echo $t['pickup_zone'] ?? 'Pickup Zone'; ?>
                                     </label>
-                                    <select name="pickup_zone" id="pickupZone" class="form-select" required onchange="(function(sel){var d=document.getElementById('dropoffZone');if(!d)return;if(sel.value){d.disabled=false;d.removeAttribute('disabled');d.classList.remove('disabled');d.style.cssText='pointer-events:auto !important;opacity:1 !important;background-color:#fff !important;cursor:pointer !important;';setTimeout(function(){d.disabled=false;d.removeAttribute('disabled');},10);}else{d.disabled=true;d.setAttribute('disabled','disabled');d.value='';d.style.cssText='';}if(typeof calculateDeliveryPrice==='function')calculateDeliveryPrice();})(this);" oninput="this.onchange();">
+                                    <select name="pickup_zone" id="pickupZone" class="form-select" required onchange="(function(sel){var d=document.getElementById('dropoffZone');if(!d)return;if(sel.value){d.disabled=false;d.removeAttribute('disabled');d.classList.remove('disabled');d.classList.add('zone-enabled');d.style.cssText='pointer-events:auto !important;opacity:1 !important;background-color:#fff !important;cursor:pointer !important;';setTimeout(function(){d.disabled=false;d.removeAttribute('disabled');},10);}else{d.disabled=true;d.setAttribute('disabled','disabled');d.classList.remove('zone-enabled');d.value='';d.style.cssText='';}if(typeof calculateDeliveryPrice==='function')calculateDeliveryPrice();})(this);" oninput="this.onchange();">
                                         <option value=""><?php echo $t['select_zone'] ?? 'Select zone'; ?></option>
                                         <?php foreach($zones as $key => $name): ?>
                                         <option value="<?php echo e($key); ?>"><?php echo ($lang == 'ar') ? $name : (($lang == 'fr' && isset($zones_fr[$key])) ? $zones_fr[$key] : $key); ?></option>
