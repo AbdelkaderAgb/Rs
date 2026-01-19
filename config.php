@@ -38,6 +38,7 @@ $uploads_dir = __DIR__ . '/uploads';  // Profile pictures directory
 // ==========================================
 // NOUAKCHOTT ZONES (Moughataas)
 // ==========================================
+// Arabic zone names
 $zones = [
     'Tevragh Zeina' => 'تفرغ زينة',
     'Ksar' => 'لكصر',
@@ -48,6 +49,19 @@ $zones = [
     'Arafat' => 'عرفات',
     'El Mina' => 'الميناء',
     'Riyad' => 'الرياض'
+];
+
+// French zone names
+$zones_fr = [
+    'Tevragh Zeina' => 'Tevragh Zeina',
+    'Ksar' => 'Ksar',
+    'Sebkha' => 'Sebkha',
+    'Teyarett' => 'Teyarett',
+    'Dar Naïm' => 'Dar Naïm',
+    'Toujounine' => 'Toujounine',
+    'Arafat' => 'Arafat',
+    'El Mina' => 'El Mina',
+    'Riyad' => 'Riyad'
 ];
 
 // ==========================================

@@ -422,8 +422,8 @@ if (isset($_SESSION['user'])) {
 
             // Set address to zone info if not provided
             if (empty($address)) {
-                $pickup_name = ($lang == 'ar' && isset($zones[$pickup_zone])) ? $zones[$pickup_zone] : $pickup_zone;
-                $dropoff_name = ($lang == 'ar' && isset($zones[$dropoff_zone])) ? $zones[$dropoff_zone] : $dropoff_zone;
+                $pickup_name = ($lang == 'ar' && isset($zones[$pickup_zone])) ? $zones[$pickup_zone] : (($lang == 'fr' && isset($zones_fr[$pickup_zone])) ? $zones_fr[$pickup_zone] : $pickup_zone);
+                $dropoff_name = ($lang == 'ar' && isset($zones[$dropoff_zone])) ? $zones[$dropoff_zone] : (($lang == 'fr' && isset($zones_fr[$dropoff_zone])) ? $zones_fr[$dropoff_zone] : $dropoff_zone);
                 $address = $pickup_name . ' → ' . $dropoff_name;
             }
 
@@ -597,8 +597,8 @@ if (isset($_SESSION['user'])) {
 
             // Set address to zone info if not provided
             if (empty($address)) {
-                $pickup_name = ($lang == 'ar' && isset($zones[$pickup_zone])) ? $zones[$pickup_zone] : $pickup_zone;
-                $dropoff_name = ($lang == 'ar' && isset($zones[$dropoff_zone])) ? $zones[$dropoff_zone] : $dropoff_zone;
+                $pickup_name = ($lang == 'ar' && isset($zones[$pickup_zone])) ? $zones[$pickup_zone] : (($lang == 'fr' && isset($zones_fr[$pickup_zone])) ? $zones_fr[$pickup_zone] : $pickup_zone);
+                $dropoff_name = ($lang == 'ar' && isset($zones[$dropoff_zone])) ? $zones[$dropoff_zone] : (($lang == 'fr' && isset($zones_fr[$dropoff_zone])) ? $zones_fr[$dropoff_zone] : $dropoff_zone);
                 $address = $pickup_name . ' → ' . $dropoff_name;
             }
 
