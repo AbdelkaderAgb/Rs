@@ -2901,10 +2901,9 @@ function calculateDeliveryPrice() {
     const summaryPickupZone = document.getElementById('summaryPickupZone');
     const summaryDropoffZone = document.getElementById('summaryDropoffZone');
 
-    if (!summaryContainer || !basePriceDisplay || !finalPriceDisplay) return;
-
     // Enable/disable dropoff zone based on pickup zone selection
     // Dropoff zone is frozen until pickup zone is selected
+    // This must happen BEFORE the early return to ensure the dropoff zone is always enabled/disabled correctly
     if (dropoffZoneSelect) {
         if (pickupZone) {
             // Enable dropoff zone when pickup is selected
@@ -2916,6 +2915,8 @@ function calculateDeliveryPrice() {
             dropoffZoneSelect.value = '';
         }
     }
+
+    if (!summaryContainer || !basePriceDisplay || !finalPriceDisplay) return;
 
     // Pricing constants for fallback when no routes found
     const DEFAULT_PRICE = 150;
