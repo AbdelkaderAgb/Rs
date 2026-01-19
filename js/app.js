@@ -826,7 +826,12 @@ function initRealtimePolling(userRole, translations) {
 
                         // Only refresh page if user is not actively filling out the order form
                         // This prevents the order summary from disappearing while the user is selecting zones
-                        if (!isFillingOrderForm) {
+                        // Check multiple conditions to ensure we don't interrupt the user:
+                        // 1. isFillingOrderForm flag (set on form focus/interaction)
+                        // 2. isOrderSummaryVisible() - order summary is displayed
+                        // 3. isAnyZoneSelected() - user has selected at least one zone
+                        const userIsFillingForm = isFillingOrderForm || isOrderSummaryVisible() || isAnyZoneSelected();
+                        if (!userIsFillingForm) {
                             setTimeout(() => location.reload(), 2000);
                         }
                     }

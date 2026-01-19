@@ -2068,6 +2068,10 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                                 <div class="slider-thumb"><i class="fa-solid fa-paper-plane"></i></div>
                                 <div class="slider-text"><?php echo $t['btn_publish']; ?></div>
                             </button>
+                            
+                            <button type="button" class="btn btn-outline-secondary w-100 mt-2 rounded-pill" onclick="clearOrderForm()">
+                                <i class="fas fa-times me-2"></i><?php echo $t['btn_clear'] ?? 'Clear'; ?>
+                            </button>
                         </form>
                     </div>
                 </div>
