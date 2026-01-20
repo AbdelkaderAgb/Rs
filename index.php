@@ -2893,6 +2893,13 @@ const AppConfig = {
 // Zone price matrix for client-side calculation
 const zonePrices = <?php echo json_encode($zone_prices); ?>;
 
+// Verify zonePrices loaded correctly for both languages
+if (typeof zonePrices === 'undefined' || !Array.isArray(zonePrices) || zonePrices.length === 0) {
+    console.error('Zone prices failed to load properly. Order summary may not work correctly.');
+} else {
+    console.log(`Zone prices loaded successfully: ${zonePrices.length} routes available`);
+}
+
 // Global state for order pricing
 let currentBasePrice = 0;
 let currentDiscount = 0;
@@ -2902,8 +2909,15 @@ let currentPromoValid = false;
 function calculateDeliveryPrice() {
     const pickupZoneSelect = document.getElementById('pickupZone');
     const dropoffZoneSelect = document.getElementById('dropoffZone');
-    const pickupZone = pickupZoneSelect?.value;
-    const dropoffZone = dropoffZoneSelect?.value;
+    
+    // Early validation - ensure elements exist
+    if (!pickupZoneSelect || !dropoffZoneSelect) {
+        console.warn('Zone select elements not found');
+        return;
+    }
+    
+    const pickupZone = pickupZoneSelect.value;
+    const dropoffZone = dropoffZoneSelect.value;
     const summaryContainer = document.getElementById('orderSummaryContainer');
     const basePriceDisplay = document.getElementById('basePriceDisplay');
     const finalPriceDisplay = document.getElementById('finalPriceDisplay');
@@ -2939,7 +2953,10 @@ function calculateDeliveryPrice() {
         }
     }
 
-    if (!summaryContainer || !basePriceDisplay || !finalPriceDisplay) return;
+    if (!summaryContainer || !basePriceDisplay || !finalPriceDisplay) {
+        console.warn('Order summary display elements not found');
+        return;
+    }
 
     // Pricing constants for fallback when no routes found
     const DEFAULT_PRICE = 150;
@@ -2948,12 +2965,26 @@ function calculateDeliveryPrice() {
     if (pickupZone && dropoffZone) {
         // Both zones selected - find exact price
         let price = DEFAULT_PRICE;
+        let priceFound = false;
+        
+        // Ensure zonePrices is defined and is an array
+        if (typeof zonePrices === 'undefined' || !Array.isArray(zonePrices)) {
+            console.error('zonePrices is not properly defined');
+            return;
+        }
+        
         for (const route of zonePrices) {
             if (route.from === pickupZone && route.to === dropoffZone) {
                 price = route.price;
+                priceFound = true;
                 break;
             }
         }
+        
+        if (!priceFound) {
+            console.warn(`No price found for route ${pickupZone} -> ${dropoffZone}, using default: ${DEFAULT_PRICE}`);
+        }
+        
         currentBasePrice = price;
         
         // Update the route display in summary
