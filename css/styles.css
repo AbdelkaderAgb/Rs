@@ -2352,7 +2352,7 @@
 
         .ultra-card {
             background: linear-gradient(145deg, #ffffff, #f8f9fa);
-            border-radius: var(--radius-xl);
+            border-radius: var(--radius-lg);
             padding: 6px;
             margin-bottom: 25px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.08),
@@ -3227,6 +3227,7 @@ form.submitting button[type="submit"]::before {
 .form-select:disabled {
     background-color: var(--gray-100);
     cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* Form Labels */
@@ -3249,160 +3250,56 @@ form.submitting button[type="submit"]::before {
     border-right: none;
     color: var(--text-sub);
     font-weight: 600;
+    border-radius: var(--radius) 0 0 var(--radius);
 }
 
 [dir="rtl"] .input-group-text {
     border-right: 2px solid var(--gray-200);
     border-left: none;
+    border-radius: 0 var(--radius) var(--radius) 0;
 }
 
 .input-group .form-control {
     border-left: none;
+    border-radius: 0 var(--radius) var(--radius) 0;
 }
 
 [dir="rtl"] .input-group .form-control {
     border-left: 2px solid var(--gray-200);
     border-right: none;
+    border-radius: var(--radius) 0 0 var(--radius);
 }
 
-/* ==========================================
-   FLASH MESSAGES / ALERTS POSITIONING
-   ========================================== */
-
-.alert {
-    border-radius: var(--radius-lg);
-    border: none;
-    padding: 16px 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    animation: slideDown 0.4s ease-out;
+/* Zone Selection Smooth Transition */
+.form-select {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
+.form-select:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    background-color: var(--gray-100);
+}
+
+.form-select.zone-enabled {
+    opacity: 1;
+    pointer-events: auto;
+    background-color: white;
+    animation: zoneUnlock 0.4s ease-out;
+}
+
+@keyframes zoneUnlock {
+    0% {
+        opacity: 0.5;
+        transform: scale(0.98);
     }
-    to {
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
         opacity: 1;
-        transform: translateY(0);
+        transform: scale(1);
     }
-}
-
-.alert-success {
-    background: linear-gradient(135deg, #00C851 0%, #00a844 100%);
-    color: white;
-}
-
-.alert-error,
-.alert-danger {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    color: white;
-}
-
-.alert-warning {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    color: white;
-}
-
-.alert-info {
-    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-    color: white;
-}
-
-/* ==========================================
-   CONSISTENT BUTTON SIZING
-   ========================================== */
-
-.btn {
-    border-radius: var(--radius);
-    padding: 12px 24px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btn-sm {
-    padding: 8px 16px;
-    font-size: 0.875rem;
-}
-
-.btn-lg {
-    padding: 16px 32px;
-    font-size: 1.125rem;
-}
-
-/* Button Variants */
-.btn-primary {
-    background: var(--primary);
-    color: white;
-}
-
-.btn-primary:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(88, 75, 246, 0.3);
-}
-
-.btn-success {
-    background: var(--success);
-    color: white;
-}
-
-.btn-success:hover {
-    background: #00a844;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 200, 81, 0.3);
-}
-
-.btn-danger {
-    background: var(--danger);
-    color: white;
-}
-
-.btn-danger:hover {
-    background: #dc2626;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
-}
-
-/* Outline Button Variants */
-.btn-outline-primary {
-    background: transparent;
-    color: var(--primary);
-    border-color: var(--primary);
-}
-
-.btn-outline-primary:hover {
-    background: var(--primary);
-    color: white;
-}
-
-.btn-outline-success {
-    background: transparent;
-    color: var(--success);
-    border-color: var(--success);
-}
-
-.btn-outline-success:hover {
-    background: var(--success);
-    color: white;
-}
-
-.btn-outline-danger {
-    background: transparent;
-    color: var(--danger);
-    border-color: var(--danger);
-}
-
-.btn-outline-danger:hover {
-    background: var(--danger);
-    color: white;
 }
 
 /* ==========================================
@@ -3679,7 +3576,7 @@ form.submitting button[type="submit"]::before {
    ========================================== */
 .price-summary-box {
     background: linear-gradient(165deg, #ffffff 0%, #f8fafc 40%, #eef2ff 100%);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: 0 12px 35px rgba(88, 75, 246, 0.12),
                 0 4px 15px rgba(0, 0, 0, 0.05);
