@@ -2894,10 +2894,13 @@ const AppConfig = {
 const zonePrices = <?php echo json_encode($zone_prices); ?>;
 
 // Verify zonePrices loaded correctly for both languages
+let zonePricesValid = false;
 if (typeof zonePrices === 'undefined' || !Array.isArray(zonePrices) || zonePrices.length === 0) {
-    console.error('Zone prices failed to load properly. Order summary may not work correctly.');
+    console.error('Zone prices failed to load properly. Order summary will not work correctly.');
+    zonePricesValid = false;
 } else {
     console.log(`Zone prices loaded successfully: ${zonePrices.length} routes available`);
+    zonePricesValid = true;
 }
 
 // Global state for order pricing
@@ -2907,6 +2910,12 @@ let currentPromoValid = false;
 
 // Calculate delivery price based on selected zones
 function calculateDeliveryPrice() {
+    // Early validation - ensure zonePrices is valid
+    if (!zonePricesValid) {
+        console.error('Cannot calculate price: zonePrices is not properly loaded');
+        return;
+    }
+    
     const pickupZoneSelect = document.getElementById('pickupZone');
     const dropoffZoneSelect = document.getElementById('dropoffZone');
     
@@ -2966,12 +2975,6 @@ function calculateDeliveryPrice() {
         // Both zones selected - find exact price
         let price = DEFAULT_PRICE;
         let priceFound = false;
-        
-        // Ensure zonePrices is defined and is an array
-        if (typeof zonePrices === 'undefined' || !Array.isArray(zonePrices)) {
-            console.error('zonePrices is not properly defined');
-            return;
-        }
         
         for (const route of zonePrices) {
             if (route.from === pickupZone && route.to === dropoffZone) {
