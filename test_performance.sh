@@ -10,12 +10,11 @@ echo ""
 # Check if database credentials are set
 if [ -z "$DB_HOST" ] || [ -z "$DB_USER" ] || [ -z "$DB_NAME" ]; then
     echo "⚠️  Database environment variables not set"
-    echo "Please set: DB_HOST, DB_USER, DB_PASS, DB_NAME"
+    echo "Please set: DB_HOST, DB_USER, DB_NAME (password will be prompted)"
     echo ""
     echo "Example:"
     echo "  export DB_HOST=localhost"
     echo "  export DB_USER=root"
-    echo "  export DB_PASS=password"
     echo "  export DB_NAME=delivery_db"
     echo ""
 fi
@@ -25,7 +24,7 @@ echo "======================================"
 echo ""
 
 echo "1. Apply Database Indexes:"
-echo "   Run: mysql -u \$DB_USER -p\$DB_PASS \$DB_NAME < performance_indexes.sql"
+echo "   Run: mysql -u \$DB_USER -p \$DB_NAME < performance_indexes.sql"
 echo ""
 
 echo "2. Verify Indexes Created:"
@@ -60,13 +59,13 @@ echo ""
 # Count existing data
 if [ ! -z "$DB_USER" ] && [ ! -z "$DB_NAME" ]; then
     echo "Current Database Stats:"
-    mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "
+    mysql -u "$DB_USER" -p "$DB_NAME" -e "
         SELECT 'Total Orders' as Metric, COUNT(*) as Count FROM orders1
         UNION ALL
         SELECT 'Total Drivers', COUNT(*) FROM users1 WHERE role='driver'
         UNION ALL
         SELECT 'Total Customers', COUNT(*) FROM users1 WHERE role='customer';
-    " 2>/dev/null || echo "   Could not connect to database"
+    " 2>/dev/null || echo "   Could not connect to database (use -p flag for password prompt)"
     echo ""
 fi
 

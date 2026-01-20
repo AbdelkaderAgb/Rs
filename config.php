@@ -33,6 +33,7 @@ $help_phone = "+222 41 31 29 31";
 $points_cost_per_order = 20;
 $driver_max_active_orders = 2;        // Max concurrent orders per driver
 $order_expiry_hours = 3;              // Orders expire after 3 hours without acceptance
+$driver_list_cache_limit = 1000;      // Max drivers to cache for dropdowns (prevents memory issues)
 $uploads_dir = __DIR__ . '/uploads';  // Profile pictures directory
 
 // ==========================================

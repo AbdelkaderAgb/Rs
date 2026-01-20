@@ -453,8 +453,14 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
             <?php
             // Optimized Statistics Queries - Consolidated to reduce database calls
             
+            // Pre-calculate date ranges for better readability and reusability
+            $today = date('Y-m-d');
+            $weekStart = date('Y-m-d', strtotime('monday this week'));
+            $monthStart = date('Y-m-01');
+            $yearStart = date('Y-01-01');
+            
             // User statistics - Single query with conditional aggregation
-            $userStatsQuery = $conn->query("
+            $userStatsQuery = $conn->prepare("
                 SELECT 
                     SUM(CASE WHEN role='customer' THEN 1 ELSE 0 END) as total_customers,
                     SUM(CASE WHEN role='driver' THEN 1 ELSE 0 END) as total_drivers,
@@ -462,14 +468,16 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                     SUM(CASE WHEN role='driver' AND is_verified=1 THEN 1 ELSE 0 END) as verified_drivers,
                     SUM(CASE WHEN role='driver' AND is_online=1 AND status='active' THEN 1 ELSE 0 END) as online_drivers,
                     SUM(CASE WHEN role='driver' AND status='banned' THEN 1 ELSE 0 END) as banned_drivers,
-                    SUM(CASE WHEN role='customer' AND created_at >= CURDATE() THEN 1 ELSE 0 END) as new_customers_today,
-                    SUM(CASE WHEN role='driver' AND created_at >= CURDATE() THEN 1 ELSE 0 END) as new_drivers_today,
-                    SUM(CASE WHEN role='customer' AND created_at >= DATE_SUB(CURDATE(), INTERVAL DAYOFWEEK(CURDATE())-1 DAY) THEN 1 ELSE 0 END) as new_customers_week,
-                    SUM(CASE WHEN role='driver' AND created_at >= DATE_SUB(CURDATE(), INTERVAL DAYOFWEEK(CURDATE())-1 DAY) THEN 1 ELSE 0 END) as new_drivers_week,
-                    SUM(CASE WHEN role='customer' AND YEAR(created_at)=YEAR(CURDATE()) AND MONTH(created_at)=MONTH(CURDATE()) THEN 1 ELSE 0 END) as new_customers_month,
-                    SUM(CASE WHEN role='driver' AND YEAR(created_at)=YEAR(CURDATE()) AND MONTH(created_at)=MONTH(CURDATE()) THEN 1 ELSE 0 END) as new_drivers_month
+                    SUM(CASE WHEN role='customer' AND created_at >= ? THEN 1 ELSE 0 END) as new_customers_today,
+                    SUM(CASE WHEN role='driver' AND created_at >= ? THEN 1 ELSE 0 END) as new_drivers_today,
+                    SUM(CASE WHEN role='customer' AND created_at >= ? THEN 1 ELSE 0 END) as new_customers_week,
+                    SUM(CASE WHEN role='driver' AND created_at >= ? THEN 1 ELSE 0 END) as new_drivers_week,
+                    SUM(CASE WHEN role='customer' AND created_at >= ? THEN 1 ELSE 0 END) as new_customers_month,
+                    SUM(CASE WHEN role='driver' AND created_at >= ? THEN 1 ELSE 0 END) as new_drivers_month
                 FROM users1
-            ")->fetch(PDO::FETCH_ASSOC);
+            ");
+            $userStatsQuery->execute([$today, $today, $weekStart, $weekStart, $monthStart, $monthStart]);
+            $userStatsQuery = $userStatsQuery->fetch(PDO::FETCH_ASSOC);
             
             $totalCustomers = $userStatsQuery['total_customers'];
             $totalDrivers = $userStatsQuery['total_drivers'];
@@ -485,31 +493,33 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
             $newDriversMonth = $userStatsQuery['new_drivers_month'];
 
             // Order statistics - Single query with conditional aggregation
-            $orderStatsQuery = $conn->query("
+            $orderStatsQuery = $conn->prepare("
                 SELECT 
                     COUNT(*) as total_orders,
                     SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) as pending_orders,
                     SUM(CASE WHEN status IN ('accepted', 'picked_up') THEN 1 ELSE 0 END) as active_orders,
                     SUM(CASE WHEN status='delivered' THEN 1 ELSE 0 END) as delivered_orders,
                     SUM(CASE WHEN status='cancelled' THEN 1 ELSE 0 END) as cancelled_orders,
-                    SUM(CASE WHEN created_at >= CURDATE() THEN 1 ELSE 0 END) as today_orders,
-                    SUM(CASE WHEN delivered_at >= CURDATE() AND status='delivered' THEN 1 ELSE 0 END) as today_delivered,
-                    SUM(CASE WHEN cancelled_at >= CURDATE() AND status='cancelled' THEN 1 ELSE 0 END) as today_cancelled,
-                    SUM(CASE WHEN created_at >= CURDATE() AND status='pending' THEN 1 ELSE 0 END) as today_pending,
-                    SUM(CASE WHEN created_at >= DATE_SUB(CURDATE(), INTERVAL DAYOFWEEK(CURDATE())-1 DAY) THEN 1 ELSE 0 END) as week_orders,
-                    SUM(CASE WHEN delivered_at >= DATE_SUB(CURDATE(), INTERVAL DAYOFWEEK(CURDATE())-1 DAY) AND status='delivered' THEN 1 ELSE 0 END) as week_delivered,
-                    SUM(CASE WHEN YEAR(created_at)=YEAR(CURDATE()) AND MONTH(created_at)=MONTH(CURDATE()) THEN 1 ELSE 0 END) as month_orders,
-                    SUM(CASE WHEN YEAR(delivered_at)=YEAR(CURDATE()) AND MONTH(delivered_at)=MONTH(CURDATE()) AND status='delivered' THEN 1 ELSE 0 END) as month_delivered,
+                    SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as today_orders,
+                    SUM(CASE WHEN delivered_at >= ? AND status='delivered' THEN 1 ELSE 0 END) as today_delivered,
+                    SUM(CASE WHEN cancelled_at >= ? AND status='cancelled' THEN 1 ELSE 0 END) as today_cancelled,
+                    SUM(CASE WHEN created_at >= ? AND status='pending' THEN 1 ELSE 0 END) as today_pending,
+                    SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as week_orders,
+                    SUM(CASE WHEN delivered_at >= ? AND status='delivered' THEN 1 ELSE 0 END) as week_delivered,
+                    SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as month_orders,
+                    SUM(CASE WHEN delivered_at >= ? AND status='delivered' THEN 1 ELSE 0 END) as month_delivered,
                     COALESCE(SUM(CASE WHEN status='delivered' THEN points_cost ELSE 0 END), 0) as total_revenue,
-                    COALESCE(SUM(CASE WHEN delivered_at >= CURDATE() AND status='delivered' THEN points_cost ELSE 0 END), 0) as today_revenue,
-                    COALESCE(SUM(CASE WHEN delivered_at >= DATE_SUB(CURDATE(), INTERVAL DAYOFWEEK(CURDATE())-1 DAY) AND status='delivered' THEN points_cost ELSE 0 END), 0) as week_revenue,
-                    COALESCE(SUM(CASE WHEN YEAR(delivered_at)=YEAR(CURDATE()) AND MONTH(delivered_at)=MONTH(CURDATE()) AND status='delivered' THEN points_cost ELSE 0 END), 0) as month_revenue,
+                    COALESCE(SUM(CASE WHEN delivered_at >= ? AND status='delivered' THEN points_cost ELSE 0 END), 0) as today_revenue,
+                    COALESCE(SUM(CASE WHEN delivered_at >= ? AND status='delivered' THEN points_cost ELSE 0 END), 0) as week_revenue,
+                    COALESCE(SUM(CASE WHEN delivered_at >= ? AND status='delivered' THEN points_cost ELSE 0 END), 0) as month_revenue,
                     COALESCE(SUM(CASE WHEN status='delivered' THEN delivery_price ELSE 0 END), 0) as total_delivery_value,
-                    COALESCE(SUM(CASE WHEN delivered_at >= CURDATE() AND status='delivered' THEN delivery_price ELSE 0 END), 0) as today_delivery_value,
-                    COALESCE(SUM(CASE WHEN delivered_at >= DATE_SUB(CURDATE(), INTERVAL DAYOFWEEK(CURDATE())-1 DAY) AND status='delivered' THEN delivery_price ELSE 0 END), 0) as week_delivery_value,
-                    COALESCE(SUM(CASE WHEN YEAR(delivered_at)=YEAR(CURDATE()) AND MONTH(delivered_at)=MONTH(CURDATE()) AND status='delivered' THEN delivery_price ELSE 0 END), 0) as month_delivery_value
+                    COALESCE(SUM(CASE WHEN delivered_at >= ? AND status='delivered' THEN delivery_price ELSE 0 END), 0) as today_delivery_value,
+                    COALESCE(SUM(CASE WHEN delivered_at >= ? AND status='delivered' THEN delivery_price ELSE 0 END), 0) as week_delivery_value,
+                    COALESCE(SUM(CASE WHEN delivered_at >= ? AND status='delivered' THEN delivery_price ELSE 0 END), 0) as month_delivery_value
                 FROM orders1
-            ")->fetch(PDO::FETCH_ASSOC);
+            ");
+            $orderStatsQuery->execute([$today, $today, $today, $today, $weekStart, $weekStart, $monthStart, $monthStart, $today, $weekStart, $monthStart, $today, $weekStart, $monthStart]);
+            $orderStatsQuery = $orderStatsQuery->fetch(PDO::FETCH_ASSOC);
             
             $totalOrders = $orderStatsQuery['total_orders'];
             $pendingOrders = $orderStatsQuery['pending_orders'];
@@ -573,13 +583,13 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
             $visitorStats = getVisitorStats($conn);
             
             // Cache driver list for dropdowns (fetch once, reuse multiple times)
-            // Limited to 1000 drivers to prevent memory issues
+            // Limited by configuration to prevent memory issues
             $cachedDriverList = $conn->query("
                 SELECT id, username, serial_no, full_name, phone, points 
                 FROM users1 
                 WHERE role='driver' 
                 ORDER BY username
-                LIMIT 1000
+                LIMIT " . (int)$driver_list_cache_limit . "
             ")->fetchAll(PDO::FETCH_ASSOC);
             ?>
 
