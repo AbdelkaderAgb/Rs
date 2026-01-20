@@ -3092,7 +3092,6 @@ function showOrderConfirmation() {
     const form = document.getElementById('newOrderForm');
     const pickupZone = document.getElementById('pickupZone');
     const dropoffZone = document.getElementById('dropoffZone');
-    const details = document.getElementsByName('details')[0];
     
     // 1. Check if form exists
     if (!form) return;
@@ -3128,7 +3127,7 @@ function showOrderConfirmation() {
         const discountText = document.getElementById('confirmDiscountText');
         if (currentDiscount > 0 && currentPromoValid) {
             discountInfo.style.display = 'block';
-            discountText.textContent = '-' + currentDiscount + ' ' + (AppTranslations.mru || 'MRU');
+            discountText.textContent = '-' + currentDiscount + ' ' + (AppTranslations.mru || 'MRU') + ' ' + (AppTranslations.discount || 'discount');
         } else {
             discountInfo.style.display = 'none';
         }
