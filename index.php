@@ -2840,47 +2840,47 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
 // PHP-based translations and initialization
 const AppTranslations = {
     // Status translations
-    st_pending: '<?php echo $t['st_pending'] ?? 'Pending'; ?>',
-    st_accepted: '<?php echo $t['st_accepted'] ?? 'Accepted'; ?>',
-    st_picked_up: '<?php echo $t['st_picked_up'] ?? 'Picked Up'; ?>',
-    st_delivered: '<?php echo $t['st_delivered'] ?? 'Delivered'; ?>',
-    st_cancelled: '<?php echo $t['st_cancelled'] ?? 'Cancelled'; ?>',
+    st_pending: <?php echo json_encode($t['st_pending'] ?? 'Pending'); ?>,
+    st_accepted: <?php echo json_encode($t['st_accepted'] ?? 'Accepted'); ?>,
+    st_picked_up: <?php echo json_encode($t['st_picked_up'] ?? 'Picked Up'); ?>,
+    st_delivered: <?php echo json_encode($t['st_delivered'] ?? 'Delivered'); ?>,
+    st_cancelled: <?php echo json_encode($t['st_cancelled'] ?? 'Cancelled'); ?>,
 
     // Common translations
-    order_number: '<?php echo $t['order_number'] ?? 'Order'; ?>',
-    close: '<?php echo $t['close'] ?? 'Close'; ?>',
-    success: '<?php echo $t['success'] ?? 'Success'; ?>',
-    error: '<?php echo $t['error'] ?? 'Error'; ?>',
-    try_again: '<?php echo $t['try_again'] ?? 'Please try again'; ?>',
-    accept: '<?php echo $t['accept'] ?? 'Accept'; ?>',
-    decline: '<?php echo $t['decline'] ?? 'Decline'; ?>',
+    order_number: <?php echo json_encode($t['order_number'] ?? 'Order'); ?>,
+    close: <?php echo json_encode($t['close'] ?? 'Close'); ?>,
+    success: <?php echo json_encode($t['success'] ?? 'Success'); ?>,
+    error: <?php echo json_encode($t['error'] ?? 'Error'); ?>,
+    try_again: <?php echo json_encode($t['try_again'] ?? 'Please try again'); ?>,
+    accept: <?php echo json_encode($t['accept'] ?? 'Accept'); ?>,
+    decline: <?php echo json_encode($t['decline'] ?? 'Decline'); ?>,
 
     // GPS translations
-    geolocation_not_supported: '<?php echo $t['geolocation_not_supported'] ?? 'Geolocation is not supported by your browser'; ?>',
-    location_error: '<?php echo $t['location_error'] ?? 'Error getting location'; ?>',
-    location_denied: '<?php echo $t['location_denied'] ?? 'Location access denied. Please enable GPS.'; ?>',
-    gps_disabled: '<?php echo $t['gps_disabled'] ?? 'GPS Disabled'; ?>',
-    gps_enabled: '<?php echo $t['gps_enabled'] ?? 'GPS Enabled'; ?>',
-    gps_driver_note: '<?php echo $t['gps_driver_note'] ?? 'Enable GPS to see nearby orders'; ?>',
-    updating_location: '<?php echo $t['updating_location'] ?? 'Updating location...'; ?>',
-    location_updated: '<?php echo $t['location_updated'] ?? 'Location updated'; ?>',
+    geolocation_not_supported: <?php echo json_encode($t['geolocation_not_supported'] ?? 'Geolocation is not supported by your browser'); ?>,
+    location_error: <?php echo json_encode($t['location_error'] ?? 'Error getting location'); ?>,
+    location_denied: <?php echo json_encode($t['location_denied'] ?? 'Location access denied. Please enable GPS.'); ?>,
+    gps_disabled: <?php echo json_encode($t['gps_disabled'] ?? 'GPS Disabled'); ?>,
+    gps_enabled: <?php echo json_encode($t['gps_enabled'] ?? 'GPS Enabled'); ?>,
+    gps_driver_note: <?php echo json_encode($t['gps_driver_note'] ?? 'Enable GPS to see nearby orders'); ?>,
+    updating_location: <?php echo json_encode($t['updating_location'] ?? 'Updating location...'); ?>,
+    location_updated: <?php echo json_encode($t['location_updated'] ?? 'Location updated'); ?>,
 
     // Order translations
-    new_order_nearby: '<?php echo $t['new_order_nearby'] ?? 'New Order Nearby!'; ?>',
-    new_order_alert: '<?php echo $t['new_order_alert'] ?? 'New Order Alert'; ?>',
-    new_order: '<?php echo $t['new_order'] ?? 'new order(s)'; ?>',
-    order_accepted: '<?php echo $t['order_accepted'] ?? 'Order accepted!'; ?>',
-    order_status_changed: '<?php echo $t['order_status_changed'] ?? 'Order Status Changed'; ?>',
-    no_phone: '<?php echo $t['no_phone'] ?? 'No phone'; ?>',
+    new_order_nearby: <?php echo json_encode($t['new_order_nearby'] ?? 'New Order Nearby!'); ?>,
+    new_order_alert: <?php echo json_encode($t['new_order_alert'] ?? 'New Order Alert'); ?>,
+    new_order: <?php echo json_encode($t['new_order'] ?? 'new order(s)'); ?>,
+    order_accepted: <?php echo json_encode($t['order_accepted'] ?? 'Order accepted!'); ?>,
+    order_status_changed: <?php echo json_encode($t['order_status_changed'] ?? 'Order Status Changed'); ?>,
+    no_phone: <?php echo json_encode($t['no_phone'] ?? 'No phone'); ?>,
 
     // Time/Distance translations
-    km: '<?php echo $t['km'] ?? 'km'; ?>',
-    min: '<?php echo $t['min'] ?? 'min'; ?>',
-    driver_assigned: '<?php echo $t['driver_assigned'] ?? 'Driver assigned'; ?>',
+    km: <?php echo json_encode($t['km'] ?? 'km'); ?>,
+    min: <?php echo json_encode($t['min'] ?? 'min'); ?>,
+    driver_assigned: <?php echo json_encode($t['driver_assigned'] ?? 'Driver assigned'); ?>,
 
     // Zone translations
-    mru: '<?php echo $t['mru'] ?? 'MRU'; ?>',
-    discount: '<?php echo $t['discount'] ?? 'discount'; ?>'
+    mru: <?php echo json_encode($t['mru'] ?? 'MRU'); ?>,
+    discount: <?php echo json_encode($t['discount'] ?? 'discount'); ?>
 };
 
 const AppConfig = {
