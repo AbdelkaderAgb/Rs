@@ -477,20 +477,20 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                 FROM users1
             ");
             $userStatsQuery->execute([$today, $today, $weekStart, $weekStart, $monthStart, $monthStart]);
-            $userStatsQuery = $userStatsQuery->fetch(PDO::FETCH_ASSOC);
+            $userStats = $userStatsQuery->fetch(PDO::FETCH_ASSOC);
             
-            $totalCustomers = $userStatsQuery['total_customers'];
-            $totalDrivers = $userStatsQuery['total_drivers'];
-            $activeDrivers = $userStatsQuery['active_drivers'];
-            $verifiedDrivers = $userStatsQuery['verified_drivers'];
-            $onlineDrivers = $userStatsQuery['online_drivers'];
-            $bannedDrivers = $userStatsQuery['banned_drivers'];
-            $newCustomersToday = $userStatsQuery['new_customers_today'];
-            $newDriversToday = $userStatsQuery['new_drivers_today'];
-            $newCustomersWeek = $userStatsQuery['new_customers_week'];
-            $newDriversWeek = $userStatsQuery['new_drivers_week'];
-            $newCustomersMonth = $userStatsQuery['new_customers_month'];
-            $newDriversMonth = $userStatsQuery['new_drivers_month'];
+            $totalCustomers = $userStats['total_customers'];
+            $totalDrivers = $userStats['total_drivers'];
+            $activeDrivers = $userStats['active_drivers'];
+            $verifiedDrivers = $userStats['verified_drivers'];
+            $onlineDrivers = $userStats['online_drivers'];
+            $bannedDrivers = $userStats['banned_drivers'];
+            $newCustomersToday = $userStats['new_customers_today'];
+            $newDriversToday = $userStats['new_drivers_today'];
+            $newCustomersWeek = $userStats['new_customers_week'];
+            $newDriversWeek = $userStats['new_drivers_week'];
+            $newCustomersMonth = $userStats['new_customers_month'];
+            $newDriversMonth = $userStats['new_drivers_month'];
 
             // Order statistics - Single query with conditional aggregation
             $orderStatsQuery = $conn->prepare("
@@ -519,29 +519,29 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                 FROM orders1
             ");
             $orderStatsQuery->execute([$today, $today, $today, $today, $weekStart, $weekStart, $monthStart, $monthStart, $today, $weekStart, $monthStart, $today, $weekStart, $monthStart]);
-            $orderStatsQuery = $orderStatsQuery->fetch(PDO::FETCH_ASSOC);
+            $orderStats = $orderStatsQuery->fetch(PDO::FETCH_ASSOC);
             
-            $totalOrders = $orderStatsQuery['total_orders'];
-            $pendingOrders = $orderStatsQuery['pending_orders'];
-            $activeOrders = $orderStatsQuery['active_orders'];
-            $deliveredOrders = $orderStatsQuery['delivered_orders'];
-            $cancelledOrders = $orderStatsQuery['cancelled_orders'];
-            $todayOrders = $orderStatsQuery['today_orders'];
-            $todayDelivered = $orderStatsQuery['today_delivered'];
-            $todayCancelled = $orderStatsQuery['today_cancelled'];
-            $todayPending = $orderStatsQuery['today_pending'];
-            $weekOrders = $orderStatsQuery['week_orders'];
-            $weekDelivered = $orderStatsQuery['week_delivered'];
-            $weekRevenue = $orderStatsQuery['week_revenue'];
-            $monthOrders = $orderStatsQuery['month_orders'];
-            $monthDelivered = $orderStatsQuery['month_delivered'];
-            $monthRevenue = $orderStatsQuery['month_revenue'];
-            $totalRevenue = $orderStatsQuery['total_revenue'];
-            $todayRevenue = $orderStatsQuery['today_revenue'];
-            $totalDeliveryValue = $orderStatsQuery['total_delivery_value'];
-            $todayDeliveryValue = $orderStatsQuery['today_delivery_value'];
-            $weekDeliveryValue = $orderStatsQuery['week_delivery_value'];
-            $monthDeliveryValue = $orderStatsQuery['month_delivery_value'];
+            $totalOrders = $orderStats['total_orders'];
+            $pendingOrders = $orderStats['pending_orders'];
+            $activeOrders = $orderStats['active_orders'];
+            $deliveredOrders = $orderStats['delivered_orders'];
+            $cancelledOrders = $orderStats['cancelled_orders'];
+            $todayOrders = $orderStats['today_orders'];
+            $todayDelivered = $orderStats['today_delivered'];
+            $todayCancelled = $orderStats['today_cancelled'];
+            $todayPending = $orderStats['today_pending'];
+            $weekOrders = $orderStats['week_orders'];
+            $weekDelivered = $orderStats['week_delivered'];
+            $weekRevenue = $orderStats['week_revenue'];
+            $monthOrders = $orderStats['month_orders'];
+            $monthDelivered = $orderStats['month_delivered'];
+            $monthRevenue = $orderStats['month_revenue'];
+            $totalRevenue = $orderStats['total_revenue'];
+            $todayRevenue = $orderStats['today_revenue'];
+            $totalDeliveryValue = $orderStats['total_delivery_value'];
+            $todayDeliveryValue = $orderStats['today_delivery_value'];
+            $weekDeliveryValue = $orderStats['week_delivery_value'];
+            $monthDeliveryValue = $orderStats['month_delivery_value'];
             
             // Top Performing Drivers (optimized - limit data fetched)
             $topDrivers = $conn->query("
@@ -584,12 +584,14 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
             
             // Cache driver list for dropdowns (fetch once, reuse multiple times)
             // Limited by configuration to prevent memory issues
+            // Note: LIMIT clause doesn't support prepared statement placeholders, but value is safely cast to int
+            $driverLimit = (int)$driver_list_cache_limit;
             $cachedDriverList = $conn->query("
                 SELECT id, username, serial_no, full_name, phone, points 
                 FROM users1 
                 WHERE role='driver' 
                 ORDER BY username
-                LIMIT " . (int)$driver_list_cache_limit . "
+                LIMIT {$driverLimit}
             ")->fetchAll(PDO::FETCH_ASSOC);
             ?>
 
