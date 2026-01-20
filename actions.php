@@ -511,15 +511,15 @@ if (isset($_SESSION['user'])) {
         // Calculate delivery price based on zones
         $delivery_price = getZonePrice($pickup_zone, $dropoff_zone);
 
-        // Validate phone number (Mauritanian format: 8 digits)
-        if (!empty($client_phone) && strlen($client_phone) != 8) {
-            setFlash('error', $t['invalid_phone'] ?? 'Phone number must be exactly 8 digits');
+        // Validate phone number (Mauritanian format: 8 digits starting with 2, 3, or 4)
+        if (!empty($client_phone) && !isValidMauritanianPhone($client_phone)) {
+            setFlash('error', $t['err_phone_invalid'] ?? 'Phone must be 8 digits starting with 2, 3, or 4');
             header("Location: index.php");
             exit();
         }
 
         // Update user phone if provided and different from current phone
-        if ($client_phone && $client_phone !== $u['phone']) {
+        if ($client_phone && $client_phone !== ($u['phone'] ?? '')) {
             // Check if phone is already used by another user
             $check_phone = $conn->prepare("SELECT id FROM users1 WHERE phone = ? AND id != ?");
             $check_phone->execute([$client_phone, $uid]);
