@@ -451,70 +451,128 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
 
             <!-- Statistics -->
             <?php
-            // Enhanced Statistics Queries
-            $totalCustomers = $conn->query("SELECT COUNT(*) FROM users1 WHERE role='customer'")->fetchColumn();
-            $totalDrivers = $conn->query("SELECT COUNT(*) FROM users1 WHERE role='driver'")->fetchColumn();
-            $activeDrivers = $conn->query("SELECT COUNT(*) FROM users1 WHERE role='driver' AND status='active'")->fetchColumn();
-            $verifiedDrivers = $conn->query("SELECT COUNT(*) FROM users1 WHERE role='driver' AND is_verified=1")->fetchColumn();
-            $onlineDrivers = $conn->query("SELECT COUNT(*) FROM users1 WHERE role='driver' AND is_online=1 AND status='active'")->fetchColumn();
-            $bannedDrivers = $conn->query("SELECT COUNT(*) FROM users1 WHERE role='driver' AND status='banned'")->fetchColumn();
-
-            $totalOrders = $conn->query("SELECT COUNT(*) FROM orders1")->fetchColumn();
-            $pendingOrders = $conn->query("SELECT COUNT(*) FROM orders1 WHERE status='pending'")->fetchColumn();
-            $activeOrders = $conn->query("SELECT COUNT(*) FROM orders1 WHERE status IN ('accepted', 'picked_up')")->fetchColumn();
-            $deliveredOrders = $conn->query("SELECT COUNT(*) FROM orders1 WHERE status='delivered'")->fetchColumn();
-            $cancelledOrders = $conn->query("SELECT COUNT(*) FROM orders1 WHERE status='cancelled'")->fetchColumn();
-
-            $todayOrders = $conn->query("SELECT COUNT(*) FROM orders1 WHERE DATE(created_at) = CURDATE()")->fetchColumn();
-            $todayDelivered = $conn->query("SELECT COUNT(*) FROM orders1 WHERE DATE(delivered_at) = CURDATE() AND status='delivered'")->fetchColumn();
-            $todayCancelled = $conn->query("SELECT COUNT(*) FROM orders1 WHERE DATE(cancelled_at) = CURDATE() AND status='cancelled'")->fetchColumn();
-            $todayPending = $conn->query("SELECT COUNT(*) FROM orders1 WHERE DATE(created_at) = CURDATE() AND status='pending'")->fetchColumn();
-
-            // Weekly Statistics
-            $weekOrders = $conn->query("SELECT COUNT(*) FROM orders1 WHERE YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)")->fetchColumn();
-            $weekDelivered = $conn->query("SELECT COUNT(*) FROM orders1 WHERE YEARWEEK(delivered_at, 1) = YEARWEEK(CURDATE(), 1) AND status='delivered'")->fetchColumn();
-            $weekRevenue = $conn->query("SELECT COALESCE(SUM(points_cost), 0) FROM orders1 WHERE YEARWEEK(delivered_at, 1) = YEARWEEK(CURDATE(), 1) AND status='delivered'")->fetchColumn();
-
-            // Monthly Statistics
-            $monthOrders = $conn->query("SELECT COUNT(*) FROM orders1 WHERE MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())")->fetchColumn();
-            $monthDelivered = $conn->query("SELECT COUNT(*) FROM orders1 WHERE MONTH(delivered_at) = MONTH(CURDATE()) AND YEAR(delivered_at) = YEAR(CURDATE()) AND status='delivered'")->fetchColumn();
-            $monthRevenue = $conn->query("SELECT COALESCE(SUM(points_cost), 0) FROM orders1 WHERE MONTH(delivered_at) = MONTH(CURDATE()) AND YEAR(delivered_at) = YEAR(CURDATE()) AND status='delivered'")->fetchColumn();
-
-            // New Users Statistics
-            $newCustomersToday = $conn->query("SELECT COUNT(*) FROM users1 WHERE role='customer' AND DATE(created_at) = CURDATE()")->fetchColumn();
-            $newDriversToday = $conn->query("SELECT COUNT(*) FROM users1 WHERE role='driver' AND DATE(created_at) = CURDATE()")->fetchColumn();
-            $newCustomersWeek = $conn->query("SELECT COUNT(*) FROM users1 WHERE role='customer' AND YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)")->fetchColumn();
-            $newDriversWeek = $conn->query("SELECT COUNT(*) FROM users1 WHERE role='driver' AND YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)")->fetchColumn();
-            $newCustomersMonth = $conn->query("SELECT COUNT(*) FROM users1 WHERE role='customer' AND MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())")->fetchColumn();
-            $newDriversMonth = $conn->query("SELECT COUNT(*) FROM users1 WHERE role='driver' AND MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())")->fetchColumn();
-
-            $totalRevenue = $conn->query("SELECT COALESCE(SUM(points_cost), 0) FROM orders1 WHERE status='delivered'")->fetchColumn();
-            $todayRevenue = $conn->query("SELECT COALESCE(SUM(points_cost), 0) FROM orders1 WHERE DATE(delivered_at) = CURDATE() AND status='delivered'")->fetchColumn();
+            // Optimized Statistics Queries - Consolidated to reduce database calls
             
-            // Total Delivery Value (sum of delivery prices)
-            $totalDeliveryValue = $conn->query("SELECT COALESCE(SUM(delivery_price), 0) FROM orders1 WHERE status='delivered'")->fetchColumn();
-            $todayDeliveryValue = $conn->query("SELECT COALESCE(SUM(delivery_price), 0) FROM orders1 WHERE DATE(delivered_at) = CURDATE() AND status='delivered'")->fetchColumn();
-            $weekDeliveryValue = $conn->query("SELECT COALESCE(SUM(delivery_price), 0) FROM orders1 WHERE YEARWEEK(delivered_at, 1) = YEARWEEK(CURDATE(), 1) AND status='delivered'")->fetchColumn();
-            $monthDeliveryValue = $conn->query("SELECT COALESCE(SUM(delivery_price), 0) FROM orders1 WHERE MONTH(delivered_at) = MONTH(CURDATE()) AND YEAR(delivered_at) = YEAR(CURDATE()) AND status='delivered'")->fetchColumn();
+            // User statistics - Single query with conditional aggregation
+            $userStatsQuery = $conn->query("
+                SELECT 
+                    SUM(CASE WHEN role='customer' THEN 1 ELSE 0 END) as total_customers,
+                    SUM(CASE WHEN role='driver' THEN 1 ELSE 0 END) as total_drivers,
+                    SUM(CASE WHEN role='driver' AND status='active' THEN 1 ELSE 0 END) as active_drivers,
+                    SUM(CASE WHEN role='driver' AND is_verified=1 THEN 1 ELSE 0 END) as verified_drivers,
+                    SUM(CASE WHEN role='driver' AND is_online=1 AND status='active' THEN 1 ELSE 0 END) as online_drivers,
+                    SUM(CASE WHEN role='driver' AND status='banned' THEN 1 ELSE 0 END) as banned_drivers,
+                    SUM(CASE WHEN role='customer' AND created_at >= CURDATE() THEN 1 ELSE 0 END) as new_customers_today,
+                    SUM(CASE WHEN role='driver' AND created_at >= CURDATE() THEN 1 ELSE 0 END) as new_drivers_today,
+                    SUM(CASE WHEN role='customer' AND created_at >= DATE_SUB(CURDATE(), INTERVAL DAYOFWEEK(CURDATE())-1 DAY) THEN 1 ELSE 0 END) as new_customers_week,
+                    SUM(CASE WHEN role='driver' AND created_at >= DATE_SUB(CURDATE(), INTERVAL DAYOFWEEK(CURDATE())-1 DAY) THEN 1 ELSE 0 END) as new_drivers_week,
+                    SUM(CASE WHEN role='customer' AND YEAR(created_at)=YEAR(CURDATE()) AND MONTH(created_at)=MONTH(CURDATE()) THEN 1 ELSE 0 END) as new_customers_month,
+                    SUM(CASE WHEN role='driver' AND YEAR(created_at)=YEAR(CURDATE()) AND MONTH(created_at)=MONTH(CURDATE()) THEN 1 ELSE 0 END) as new_drivers_month
+                FROM users1
+            ")->fetch(PDO::FETCH_ASSOC);
             
-            // Top Performing Drivers
-            $topDrivers = $conn->query("SELECT u.id, u.full_name, u.username, u.phone, u.rating, u.avatar_url, COUNT(o.id) as order_count, COALESCE(SUM(o.points_cost), 0) as total_earnings
+            $totalCustomers = $userStatsQuery['total_customers'];
+            $totalDrivers = $userStatsQuery['total_drivers'];
+            $activeDrivers = $userStatsQuery['active_drivers'];
+            $verifiedDrivers = $userStatsQuery['verified_drivers'];
+            $onlineDrivers = $userStatsQuery['online_drivers'];
+            $bannedDrivers = $userStatsQuery['banned_drivers'];
+            $newCustomersToday = $userStatsQuery['new_customers_today'];
+            $newDriversToday = $userStatsQuery['new_drivers_today'];
+            $newCustomersWeek = $userStatsQuery['new_customers_week'];
+            $newDriversWeek = $userStatsQuery['new_drivers_week'];
+            $newCustomersMonth = $userStatsQuery['new_customers_month'];
+            $newDriversMonth = $userStatsQuery['new_drivers_month'];
+
+            // Order statistics - Single query with conditional aggregation
+            $orderStatsQuery = $conn->query("
+                SELECT 
+                    COUNT(*) as total_orders,
+                    SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) as pending_orders,
+                    SUM(CASE WHEN status IN ('accepted', 'picked_up') THEN 1 ELSE 0 END) as active_orders,
+                    SUM(CASE WHEN status='delivered' THEN 1 ELSE 0 END) as delivered_orders,
+                    SUM(CASE WHEN status='cancelled' THEN 1 ELSE 0 END) as cancelled_orders,
+                    SUM(CASE WHEN created_at >= CURDATE() THEN 1 ELSE 0 END) as today_orders,
+                    SUM(CASE WHEN delivered_at >= CURDATE() AND status='delivered' THEN 1 ELSE 0 END) as today_delivered,
+                    SUM(CASE WHEN cancelled_at >= CURDATE() AND status='cancelled' THEN 1 ELSE 0 END) as today_cancelled,
+                    SUM(CASE WHEN created_at >= CURDATE() AND status='pending' THEN 1 ELSE 0 END) as today_pending,
+                    SUM(CASE WHEN created_at >= DATE_SUB(CURDATE(), INTERVAL DAYOFWEEK(CURDATE())-1 DAY) THEN 1 ELSE 0 END) as week_orders,
+                    SUM(CASE WHEN delivered_at >= DATE_SUB(CURDATE(), INTERVAL DAYOFWEEK(CURDATE())-1 DAY) AND status='delivered' THEN 1 ELSE 0 END) as week_delivered,
+                    SUM(CASE WHEN YEAR(created_at)=YEAR(CURDATE()) AND MONTH(created_at)=MONTH(CURDATE()) THEN 1 ELSE 0 END) as month_orders,
+                    SUM(CASE WHEN YEAR(delivered_at)=YEAR(CURDATE()) AND MONTH(delivered_at)=MONTH(CURDATE()) AND status='delivered' THEN 1 ELSE 0 END) as month_delivered,
+                    COALESCE(SUM(CASE WHEN status='delivered' THEN points_cost ELSE 0 END), 0) as total_revenue,
+                    COALESCE(SUM(CASE WHEN delivered_at >= CURDATE() AND status='delivered' THEN points_cost ELSE 0 END), 0) as today_revenue,
+                    COALESCE(SUM(CASE WHEN delivered_at >= DATE_SUB(CURDATE(), INTERVAL DAYOFWEEK(CURDATE())-1 DAY) AND status='delivered' THEN points_cost ELSE 0 END), 0) as week_revenue,
+                    COALESCE(SUM(CASE WHEN YEAR(delivered_at)=YEAR(CURDATE()) AND MONTH(delivered_at)=MONTH(CURDATE()) AND status='delivered' THEN points_cost ELSE 0 END), 0) as month_revenue,
+                    COALESCE(SUM(CASE WHEN status='delivered' THEN delivery_price ELSE 0 END), 0) as total_delivery_value,
+                    COALESCE(SUM(CASE WHEN delivered_at >= CURDATE() AND status='delivered' THEN delivery_price ELSE 0 END), 0) as today_delivery_value,
+                    COALESCE(SUM(CASE WHEN delivered_at >= DATE_SUB(CURDATE(), INTERVAL DAYOFWEEK(CURDATE())-1 DAY) AND status='delivered' THEN delivery_price ELSE 0 END), 0) as week_delivery_value,
+                    COALESCE(SUM(CASE WHEN YEAR(delivered_at)=YEAR(CURDATE()) AND MONTH(delivered_at)=MONTH(CURDATE()) AND status='delivered' THEN delivery_price ELSE 0 END), 0) as month_delivery_value
+                FROM orders1
+            ")->fetch(PDO::FETCH_ASSOC);
+            
+            $totalOrders = $orderStatsQuery['total_orders'];
+            $pendingOrders = $orderStatsQuery['pending_orders'];
+            $activeOrders = $orderStatsQuery['active_orders'];
+            $deliveredOrders = $orderStatsQuery['delivered_orders'];
+            $cancelledOrders = $orderStatsQuery['cancelled_orders'];
+            $todayOrders = $orderStatsQuery['today_orders'];
+            $todayDelivered = $orderStatsQuery['today_delivered'];
+            $todayCancelled = $orderStatsQuery['today_cancelled'];
+            $todayPending = $orderStatsQuery['today_pending'];
+            $weekOrders = $orderStatsQuery['week_orders'];
+            $weekDelivered = $orderStatsQuery['week_delivered'];
+            $weekRevenue = $orderStatsQuery['week_revenue'];
+            $monthOrders = $orderStatsQuery['month_orders'];
+            $monthDelivered = $orderStatsQuery['month_delivered'];
+            $monthRevenue = $orderStatsQuery['month_revenue'];
+            $totalRevenue = $orderStatsQuery['total_revenue'];
+            $todayRevenue = $orderStatsQuery['today_revenue'];
+            $totalDeliveryValue = $orderStatsQuery['total_delivery_value'];
+            $todayDeliveryValue = $orderStatsQuery['today_delivery_value'];
+            $weekDeliveryValue = $orderStatsQuery['week_delivery_value'];
+            $monthDeliveryValue = $orderStatsQuery['month_delivery_value'];
+            
+            // Top Performing Drivers (optimized - limit data fetched)
+            $topDrivers = $conn->query("
+                SELECT u.id, u.full_name, u.username, u.phone, u.rating, u.avatar_url, 
+                       COUNT(o.id) as order_count, COALESCE(SUM(o.points_cost), 0) as total_earnings
                 FROM users1 u 
                 LEFT JOIN orders1 o ON u.id = o.driver_id AND o.status = 'delivered'
                 WHERE u.role = 'driver'
-                GROUP BY u.id
+                GROUP BY u.id, u.full_name, u.username, u.phone, u.rating, u.avatar_url
                 ORDER BY order_count DESC
-                LIMIT 5")->fetchAll();
+                LIMIT 5
+            ")->fetchAll();
             
             // Most Active Zones
-            $topZones = $conn->query("SELECT pickup_zone, COUNT(*) as order_count FROM orders1 WHERE pickup_zone IS NOT NULL AND pickup_zone != '' GROUP BY pickup_zone ORDER BY order_count DESC LIMIT 5")->fetchAll();
+            $topZones = $conn->query("
+                SELECT pickup_zone, COUNT(*) as order_count 
+                FROM orders1 
+                WHERE pickup_zone IS NOT NULL AND pickup_zone != '' 
+                GROUP BY pickup_zone 
+                ORDER BY order_count DESC 
+                LIMIT 5
+            ")->fetchAll();
             
             // Average delivery time (in minutes) - for delivered orders
-            $avgDeliveryTime = $conn->query("SELECT AVG(TIMESTAMPDIFF(MINUTE, accepted_at, delivered_at)) FROM orders1 WHERE status='delivered' AND accepted_at IS NOT NULL AND delivered_at IS NOT NULL")->fetchColumn();
+            $avgDeliveryTime = $conn->query("
+                SELECT AVG(TIMESTAMPDIFF(MINUTE, accepted_at, delivered_at)) 
+                FROM orders1 
+                WHERE status='delivered' AND accepted_at IS NOT NULL AND delivered_at IS NOT NULL
+            ")->fetchColumn();
             $avgDeliveryTime = $avgDeliveryTime ? round($avgDeliveryTime) : 0;
             
             // Visitor Statistics
             $visitorStats = getVisitorStats($conn);
+            
+            // Cache driver list for dropdowns (fetch once, reuse multiple times)
+            $cachedDriverList = $conn->query("
+                SELECT id, username, serial_no, full_name, phone, points 
+                FROM users1 
+                WHERE role='driver' 
+                ORDER BY username
+            ")->fetchAll(PDO::FETCH_ASSOC);
             ?>
 
             <!-- Enhanced Statistics Grid -->
@@ -1064,7 +1122,15 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                         <div class="card-body p-3">
                             <div class="admin-cards-grid">
                                 <?php
-                                $orders = $conn->query("SELECT o.*, u.username as driver_name FROM orders1 o LEFT JOIN users1 u ON o.driver_id=u.id ORDER BY o.id DESC LIMIT 100");
+                                // Optimized query - fetch only needed columns and limit to 50 for better performance
+                                $orders = $conn->query("
+                                    SELECT o.id, o.details, o.address, o.customer_name, o.client_phone, 
+                                           o.status, o.delivery_code, o.driver_id, u.username as driver_name
+                                    FROM orders1 o 
+                                    LEFT JOIN users1 u ON o.driver_id=u.id 
+                                    ORDER BY o.id DESC 
+                                    LIMIT 50
+                                ");
                                 if($orders->rowCount() == 0): ?>
                                 <div class="text-center py-4 text-muted">
                                     <i class="fas fa-box-open fa-2x mb-2"></i>
@@ -1158,8 +1224,8 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                                     <select name="driver_id" id="driverSelect" class="form-select" required>
                                         <option value=""><?php echo $t['select_driver'] ?? 'Select Driver'; ?></option>
                                         <?php
-                                        $ds = $conn->query("SELECT id, serial_no, username, full_name, phone, points FROM users1 WHERE role='driver' ORDER BY username");
-                                        while($d=$ds->fetch()) {
+                                        // Use cached driver list
+                                        foreach($cachedDriverList as $d) {
                                             $displayName = $d['full_name'] ?: $d['username'];
                                             $serialNo = $d['serial_no'] ?: 'N/A';
                                             echo "<option value='{$d['id']}' data-serial='{$serialNo}' data-phone='{$d['phone']}'>[{$serialNo}] {$displayName} ({$d['points']} pts)</option>";
@@ -1630,8 +1696,8 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                                     <select name="driver_id" class="form-select">
                                         <option value=""><?php echo $t['no_driver']; ?></option>
                                         <?php
-                                        $ds = $conn->query("SELECT id, username FROM users1 WHERE role='driver' ORDER BY username");
-                                        while($d=$ds->fetch()) {
+                                        // Use cached driver list
+                                        foreach($cachedDriverList as $d) {
                                             echo "<option value='{$d['id']}'>{$d['username']}</option>";
                                         }
                                         ?>
@@ -1684,8 +1750,8 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                                     <select name="driver_id" id="edit_order_driver" class="form-select">
                                         <option value=""><?php echo $t['no_driver']; ?></option>
                                         <?php
-                                        $ds = $conn->query("SELECT id, username FROM users1 WHERE role='driver' ORDER BY username");
-                                        while($d=$ds->fetch()) {
+                                        // Use cached driver list
+                                        foreach($cachedDriverList as $d) {
                                             echo "<option value='{$d['id']}'>{$d['username']}</option>";
                                         }
                                         ?>
