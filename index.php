@@ -3117,23 +3117,43 @@ function showOrderConfirmation() {
         let finalPrice = currentBasePrice - currentDiscount;
         if (finalPrice < 0) finalPrice = 0;
         
-        // Update confirmation modal content
-        document.getElementById('confirmPickupZone').textContent = pickupZoneText;
-        document.getElementById('confirmDropoffZone').textContent = dropoffZoneText;
-        document.getElementById('confirmDeliveryPrice').textContent = finalPrice + ' ' + (AppTranslations.mru || 'MRU');
+        // Check if confirmation modal exists
+        const modalEl = document.getElementById('orderConfirmModal');
+        if (!modalEl) {
+            console.error("Modal Error: orderConfirmModal element not found");
+            alert("System Error: Could not open confirmation. Please refresh.");
+            return;
+        }
         
-        // Show discount info if applicable
+        // Check if all required modal elements exist
+        const confirmPickupZoneEl = document.getElementById('confirmPickupZone');
+        const confirmDropoffZoneEl = document.getElementById('confirmDropoffZone');
+        const confirmDeliveryPriceEl = document.getElementById('confirmDeliveryPrice');
         const discountInfo = document.getElementById('confirmDiscountInfo');
         const discountText = document.getElementById('confirmDiscountText');
-        if (currentDiscount > 0 && currentPromoValid) {
-            discountInfo.style.display = 'block';
-            discountText.textContent = '-' + currentDiscount + ' ' + (AppTranslations.mru || 'MRU') + ' ' + (AppTranslations.discount || 'discount');
-        } else {
-            discountInfo.style.display = 'none';
+        
+        if (!confirmPickupZoneEl || !confirmDropoffZoneEl || !confirmDeliveryPriceEl) {
+            console.error("Modal Error: Required modal elements not found (confirmPickupZone, confirmDropoffZone, or confirmDeliveryPrice)");
+            alert("System Error: Could not open confirmation. Please refresh.");
+            return;
+        }
+        
+        // Update confirmation modal content
+        confirmPickupZoneEl.textContent = pickupZoneText;
+        confirmDropoffZoneEl.textContent = dropoffZoneText;
+        confirmDeliveryPriceEl.textContent = finalPrice + ' ' + (AppTranslations.mru || 'MRU');
+        
+        // Show discount info if applicable
+        if (discountInfo && discountText) {
+            if (currentDiscount > 0 && currentPromoValid) {
+                discountInfo.style.display = 'block';
+                discountText.textContent = '-' + currentDiscount + ' ' + (AppTranslations.mru || 'MRU') + ' ' + (AppTranslations.discount || 'discount');
+            } else {
+                discountInfo.style.display = 'none';
+            }
         }
         
         // Show the confirmation modal
-        const modalEl = document.getElementById('orderConfirmModal');
         const modal = new bootstrap.Modal(modalEl);
         modal.show();
     } catch (e) {
