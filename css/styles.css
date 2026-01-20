@@ -2352,7 +2352,7 @@
 
         .ultra-card {
             background: linear-gradient(145deg, #ffffff, #f8f9fa);
-            border-radius: var(--radius-xl);
+            border-radius: 20px;
             padding: 6px;
             margin-bottom: 25px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.08),
@@ -3208,7 +3208,7 @@ form.submitting button[type="submit"]::before {
 /* Standard Form Control Styling */
 .form-control,
 .form-select {
-    border-radius: var(--radius);
+    border-radius: 12px;
     border: 2px solid var(--gray-200);
     padding: 12px 16px;
     font-size: 1rem;
@@ -3227,6 +3227,7 @@ form.submitting button[type="submit"]::before {
 .form-select:disabled {
     background-color: var(--gray-100);
     cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* Form Labels */
@@ -3242,6 +3243,38 @@ form.submitting button[type="submit"]::before {
     color: var(--danger);
 }
 
+/* Zone Selection Smooth Transition */
+.form-select {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-select:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    background-color: var(--gray-100);
+}
+
+.form-select.zone-enabled {
+    opacity: 1;
+    pointer-events: auto;
+    background-color: white;
+    animation: zoneUnlock 0.4s ease-out;
+}
+
+@keyframes zoneUnlock {
+    0% {
+        opacity: 0.5;
+        transform: scale(0.98);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 /* Input Groups */
 .input-group-text {
     background: var(--gray-100);
@@ -3249,20 +3282,24 @@ form.submitting button[type="submit"]::before {
     border-right: none;
     color: var(--text-sub);
     font-weight: 600;
+    border-radius: 12px 0 0 12px;
 }
 
 [dir="rtl"] .input-group-text {
     border-right: 2px solid var(--gray-200);
     border-left: none;
+    border-radius: 0 12px 12px 0;
 }
 
 .input-group .form-control {
     border-left: none;
+    border-radius: 0 12px 12px 0;
 }
 
 [dir="rtl"] .input-group .form-control {
     border-left: 2px solid var(--gray-200);
     border-right: none;
+    border-radius: 12px 0 0 12px;
 }
 
 /* ==========================================
@@ -3679,7 +3716,7 @@ form.submitting button[type="submit"]::before {
    ========================================== */
 .price-summary-box {
     background: linear-gradient(165deg, #ffffff 0%, #f8fafc 40%, #eef2ff 100%);
-    border-radius: var(--radius-xl);
+    border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 12px 35px rgba(88, 75, 246, 0.12),
                 0 4px 15px rgba(0, 0, 0, 0.05);
