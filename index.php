@@ -2007,7 +2007,7 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                                     <label class="form-label small text-muted mb-1">
                                         <i class="fas fa-map-marker-alt me-1 text-danger"></i><?php echo $t['dropoff_zone'] ?? 'Dropoff Zone'; ?>
                                     </label>
-                                    <select name="dropoff_zone" id="dropoffZone" class="form-select" required onchange="calculateDeliveryPrice()" disabled>
+                                    <select name="dropoff_zone" id="dropoffZone" class="form-select" required onchange="calculateDeliveryPrice()">
                                         <option value=""><?php echo $t['select_zone'] ?? 'Select zone'; ?></option>
                                         <?php foreach($zones as $key => $name): ?>
                                         <option value="<?php echo e($key); ?>"><?php echo ($lang == 'ar') ? $name : $key; ?></option>
@@ -2903,20 +2903,6 @@ function calculateDeliveryPrice() {
 
     if (!summaryContainer || !basePriceDisplay || !finalPriceDisplay) return;
 
-    // Enable/disable dropoff zone based on pickup zone selection
-    // Dropoff zone is frozen until pickup zone is selected
-    if (dropoffZoneSelect) {
-        if (pickupZone) {
-            // Enable dropoff zone when pickup is selected
-            dropoffZoneSelect.disabled = false;
-        } else {
-            // Disable dropoff zone when no pickup selected
-            dropoffZoneSelect.disabled = true;
-            // Also reset dropoff zone selection when pickup is cleared
-            dropoffZoneSelect.value = '';
-        }
-    }
-
     // Pricing constants for fallback when no routes found
     const DEFAULT_PRICE = 150;
 
@@ -3004,7 +2990,6 @@ function clearOrderForm() {
     }
     if (dropoffZone) {
         dropoffZone.value = '';
-        dropoffZone.disabled = true; // Re-freeze dropoff zone
     }
     
     // Hide order summary
