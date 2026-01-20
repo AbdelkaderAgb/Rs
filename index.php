@@ -2773,62 +2773,6 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
             </div>
         </div>
 
-        <!-- Order Confirmation Modal -->
-        <div class="modal fade" id="orderConfirmModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title"><i class="fas fa-receipt me-2"></i><?php echo $t['confirm_order'] ?? 'Confirm Order'; ?></h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body p-4">
-                        <!-- Order Summary in Confirmation -->
-                        <div class="alert alert-light border rounded-3 py-3 px-3 mb-3">
-                            <h6 class="mb-3 fw-bold"><i class="fas fa-map-marker-alt me-2 text-primary"></i><?php echo $t['delivery_route'] ?? 'Delivery Route'; ?></h6>
-                            
-                            <!-- Route Display -->
-                            <div class="d-flex align-items-center justify-content-between p-2 bg-white rounded mb-3">
-                                <div class="text-center flex-grow-1">
-                                    <i class="fas fa-map-marker-alt text-success"></i>
-                                    <span class="small fw-bold" id="confirmPickupZone">-</span>
-                                </div>
-                                <div class="px-2">
-                                    <i class="fas fa-arrow-<?php echo $dir == 'rtl' ? 'left' : 'right'; ?> text-muted"></i>
-                                </div>
-                                <div class="text-center flex-grow-1">
-                                    <i class="fas fa-map-marker-alt text-danger"></i>
-                                    <span class="small fw-bold" id="confirmDropoffZone">-</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Price Display -->
-                            <div class="text-center p-3 rounded-3" style="background: linear-gradient(135deg, rgba(88, 75, 246, 0.1), rgba(6, 182, 212, 0.1));">
-                                <small class="text-muted d-block mb-1"><?php echo $t['delivery_price'] ?? 'Delivery Price'; ?></small>
-                                <h3 class="mb-0 fw-bold text-primary" id="confirmDeliveryPrice">0 <?php echo $t['mru'] ?? 'MRU'; ?></h3>
-                                <div id="confirmDiscountInfo" style="display: none;">
-                                    <small class="text-success"><i class="fas fa-tag me-1"></i><span id="confirmDiscountText"></span></small>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Confirmation Message -->
-                        <p class="text-center text-muted small mb-0">
-                            <i class="fas fa-info-circle me-1"></i>
-                            <?php echo $t['confirm_order_message'] ?? 'Please confirm the delivery price before submitting your order.'; ?>
-                        </p>
-                    </div>
-                    <div class="modal-footer border-0 pt-0">
-                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-1"></i><?php echo $t['cancel'] ?? 'Cancel'; ?>
-                        </button>
-                        <button type="button" class="btn btn-primary rounded-pill px-4" onclick="submitOrderForm()">
-                            <i class="fas fa-check me-1"></i><?php echo $t['confirm_and_submit'] ?? 'Confirm & Submit'; ?>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <?php endif; ?>
     </div>
 
@@ -3369,5 +3313,64 @@ document.addEventListener('DOMContentLoaded', function() {
 initRealtimePolling(AppConfig.userRole, AppTranslations);
 <?php endif; ?>
 </script>
+
+<?php if(isset($_SESSION['user']) && $_SESSION['user']['role'] == 'customer'): ?>
+<!-- Order Confirmation Modal -->
+<div class="modal fade" id="orderConfirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-receipt me-2"></i><?php echo $t['confirm_order'] ?? 'Confirm Order'; ?></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Order Summary in Confirmation -->
+                <div class="alert alert-light border rounded-3 py-3 px-3 mb-3">
+                    <h6 class="mb-3 fw-bold"><i class="fas fa-map-marker-alt me-2 text-primary"></i><?php echo $t['delivery_route'] ?? 'Delivery Route'; ?></h6>
+                    
+                    <!-- Route Display -->
+                    <div class="d-flex align-items-center justify-content-between p-2 bg-white rounded mb-3">
+                        <div class="text-center flex-grow-1">
+                            <i class="fas fa-map-marker-alt text-success"></i>
+                            <span class="small fw-bold" id="confirmPickupZone">-</span>
+                        </div>
+                        <div class="px-2">
+                            <i class="fas fa-arrow-<?php echo $dir == 'rtl' ? 'left' : 'right'; ?> text-muted"></i>
+                        </div>
+                        <div class="text-center flex-grow-1">
+                            <i class="fas fa-map-marker-alt text-danger"></i>
+                            <span class="small fw-bold" id="confirmDropoffZone">-</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Price Display -->
+                    <div class="text-center p-3 rounded-3" style="background: linear-gradient(135deg, rgba(88, 75, 246, 0.1), rgba(6, 182, 212, 0.1));">
+                        <small class="text-muted d-block mb-1"><?php echo $t['delivery_price'] ?? 'Delivery Price'; ?></small>
+                        <h3 class="mb-0 fw-bold text-primary" id="confirmDeliveryPrice">0 <?php echo $t['mru'] ?? 'MRU'; ?></h3>
+                        <div id="confirmDiscountInfo" style="display: none;">
+                            <small class="text-success"><i class="fas fa-tag me-1"></i><span id="confirmDiscountText"></span></small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Confirmation Message -->
+                <p class="text-center text-muted small mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <?php echo $t['confirm_order_message'] ?? 'Please confirm the delivery price before submitting your order.'; ?>
+                </p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i><?php echo $t['cancel'] ?? 'Cancel'; ?>
+                </button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" onclick="submitOrderForm()">
+                    <i class="fas fa-check me-1"></i><?php echo $t['confirm_and_submit'] ?? 'Confirm & Submit'; ?>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
 </body>
 </html>
