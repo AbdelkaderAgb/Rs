@@ -2893,6 +2893,14 @@ const AppConfig = {
 // Zone price matrix for client-side calculation
 const zonePrices = <?php echo json_encode($zone_prices); ?>;
 
+// Verify zonePrices loaded correctly for both languages (debug logging)
+if (!Array.isArray(zonePrices) || zonePrices.length === 0) {
+    console.error('Zone prices failed to load properly. Order summary will not work correctly.');
+} else if (window.console && typeof console.log === 'function') {
+    // Only log in development - check can be removed in production build
+    console.log(`Zone prices loaded successfully: ${zonePrices.length} routes available`);
+}
+
 // Global state for order pricing
 let currentBasePrice = 0;
 let currentDiscount = 0;
@@ -2900,10 +2908,23 @@ let currentPromoValid = false;
 
 // Calculate delivery price based on selected zones
 function calculateDeliveryPrice() {
+    // Early validation - ensure zonePrices is valid
+    if (!Array.isArray(zonePrices) || zonePrices.length === 0) {
+        console.error('Cannot calculate price: zonePrices is not properly loaded');
+        return;
+    }
+    
     const pickupZoneSelect = document.getElementById('pickupZone');
     const dropoffZoneSelect = document.getElementById('dropoffZone');
-    const pickupZone = pickupZoneSelect?.value;
-    const dropoffZone = dropoffZoneSelect?.value;
+    
+    // Early validation - ensure elements exist
+    if (!pickupZoneSelect || !dropoffZoneSelect) {
+        console.warn('Zone select elements not found');
+        return;
+    }
+    
+    const pickupZone = pickupZoneSelect.value;
+    const dropoffZone = dropoffZoneSelect.value;
     const summaryContainer = document.getElementById('orderSummaryContainer');
     const basePriceDisplay = document.getElementById('basePriceDisplay');
     const finalPriceDisplay = document.getElementById('finalPriceDisplay');
@@ -2939,21 +2960,24 @@ function calculateDeliveryPrice() {
         }
     }
 
-    if (!summaryContainer || !basePriceDisplay || !finalPriceDisplay) return;
+    if (!summaryContainer || !basePriceDisplay || !finalPriceDisplay) {
+        console.warn('Order summary display elements not found');
+        return;
+    }
 
     // Pricing constants for fallback when no routes found
     const DEFAULT_PRICE = 150;
 
     // Show summary only when both zones are selected (to show exact price, not range)
     if (pickupZone && dropoffZone) {
-        // Both zones selected - find exact price
-        let price = DEFAULT_PRICE;
-        for (const route of zonePrices) {
-            if (route.from === pickupZone && route.to === dropoffZone) {
-                price = route.price;
-                break;
-            }
+        // Find exact price for the route
+        const route = zonePrices.find(r => r.from === pickupZone && r.to === dropoffZone);
+        const price = route ? route.price : DEFAULT_PRICE;
+        
+        if (!route) {
+            console.warn(`No price found for route ${pickupZone} -> ${dropoffZone}, using default: ${DEFAULT_PRICE}`);
         }
+        
         currentBasePrice = price;
         
         // Update the route display in summary
