@@ -1984,7 +1984,7 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
                                 <label class="form-label small text-muted mb-1">
                                     <i class="fas fa-box me-1"></i><?php echo $t['order_details']; ?>
                                 </label>
-                                <textarea name="details" class="form-control" rows="3" placeholder="<?php echo $t['order_details_placeholder'] ?? 'Describe what you need delivered...'; ?>" required style="border-radius: 12px; border: 2px solid var(--gray-200);"></textarea>
+                                <textarea name="details" class="form-control" rows="3" placeholder="<?php echo $t['order_details_placeholder'] ?? 'Describe what you need delivered...'; ?>" required></textarea>
                             </div>
 
                             <div class="mb-3">
