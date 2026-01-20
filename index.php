@@ -3133,7 +3133,7 @@ function showOrderConfirmation() {
         const discountText = document.getElementById('confirmDiscountText');
         
         if (!confirmPickupZoneEl || !confirmDropoffZoneEl || !confirmDeliveryPriceEl) {
-            console.error("Modal Error: Required modal elements not found");
+            console.error("Modal Error: Required modal elements not found (confirmPickupZone, confirmDropoffZone, or confirmDeliveryPrice)");
             alert("System Error: Could not open confirmation. Please refresh.");
             return;
         }
