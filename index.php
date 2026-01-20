@@ -535,12 +535,18 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
             
             // Top Performing Drivers (optimized - limit data fetched)
             $topDrivers = $conn->query("
-                SELECT u.id, u.full_name, u.username, u.phone, u.rating, u.avatar_url, 
-                       COUNT(o.id) as order_count, COALESCE(SUM(o.points_cost), 0) as total_earnings
+                SELECT u.id, 
+                       ANY_VALUE(u.full_name) as full_name, 
+                       ANY_VALUE(u.username) as username, 
+                       ANY_VALUE(u.phone) as phone, 
+                       ANY_VALUE(u.rating) as rating, 
+                       ANY_VALUE(u.avatar_url) as avatar_url, 
+                       COUNT(o.id) as order_count, 
+                       COALESCE(SUM(o.points_cost), 0) as total_earnings
                 FROM users1 u 
                 LEFT JOIN orders1 o ON u.id = o.driver_id AND o.status = 'delivered'
                 WHERE u.role = 'driver'
-                GROUP BY u.id, u.full_name, u.username, u.phone, u.rating, u.avatar_url
+                GROUP BY u.id
                 ORDER BY order_count DESC
                 LIMIT 5
             ")->fetchAll();
@@ -567,11 +573,13 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
             $visitorStats = getVisitorStats($conn);
             
             // Cache driver list for dropdowns (fetch once, reuse multiple times)
+            // Limited to 1000 drivers to prevent memory issues
             $cachedDriverList = $conn->query("
                 SELECT id, username, serial_no, full_name, phone, points 
                 FROM users1 
                 WHERE role='driver' 
                 ORDER BY username
+                LIMIT 1000
             ")->fetchAll(PDO::FETCH_ASSOC);
             ?>
 
