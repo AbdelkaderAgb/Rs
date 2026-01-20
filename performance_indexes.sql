@@ -1,6 +1,8 @@
 -- ============================================
 -- Performance Optimization Indexes
 -- Add composite indexes to improve dashboard query performance
+-- Note: Using dynamic SQL with existence checks for MySQL 5.7 compatibility
+-- (CREATE INDEX IF NOT EXISTS is only available in MySQL 8.0+)
 -- ============================================
 
 -- Add composite index for status + created_at (for today/week/month order counts)

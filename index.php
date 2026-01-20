@@ -584,8 +584,9 @@ trackVisitor($conn, isset($_SESSION['user']) ? $_SESSION['user']['id'] : null);
             
             // Cache driver list for dropdowns (fetch once, reuse multiple times)
             // Limited by configuration to prevent memory issues
-            // Note: LIMIT clause doesn't support prepared statement placeholders, but value is safely cast to int
-            $driverLimit = (int)$driver_list_cache_limit;
+            // Note: LIMIT clause doesn't support prepared statement placeholders
+            // Value is validated and cast to int to prevent SQL injection
+            $driverLimit = max(1, min((int)$driver_list_cache_limit, 10000)); // Clamp between 1 and 10000
             $cachedDriverList = $conn->query("
                 SELECT id, username, serial_no, full_name, phone, points 
                 FROM users1 
