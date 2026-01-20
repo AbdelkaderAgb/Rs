@@ -2893,12 +2893,11 @@ const AppConfig = {
 // Zone price matrix for client-side calculation
 const zonePrices = <?php echo json_encode($zone_prices); ?>;
 
-// Verify zonePrices loaded correctly for both languages
-let zonePricesValid = true;
+// Verify zonePrices loaded correctly for both languages (debug logging)
 if (!Array.isArray(zonePrices) || zonePrices.length === 0) {
     console.error('Zone prices failed to load properly. Order summary will not work correctly.');
-    zonePricesValid = false;
-} else {
+} else if (window.console && typeof console.log === 'function') {
+    // Only log in development - check can be removed in production build
     console.log(`Zone prices loaded successfully: ${zonePrices.length} routes available`);
 }
 
@@ -2910,7 +2909,7 @@ let currentPromoValid = false;
 // Calculate delivery price based on selected zones
 function calculateDeliveryPrice() {
     // Early validation - ensure zonePrices is valid
-    if (!zonePricesValid) {
+    if (!Array.isArray(zonePrices) || zonePrices.length === 0) {
         console.error('Cannot calculate price: zonePrices is not properly loaded');
         return;
     }
