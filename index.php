@@ -3405,7 +3405,7 @@ initRealtimePolling(AppConfig.userRole, AppTranslations);
 <?php endif; ?>
 </script>
 
-<?php if(isset($_SESSION['user']) && $_SESSION['user']['role'] == 'customer'): ?>
+<?php if(isset($role) && $role == 'customer'): ?>
 <!-- Order Confirmation Modal -->
 <div class="modal fade" id="orderConfirmModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
