@@ -2880,7 +2880,8 @@ const AppTranslations = {
 
     // Zone translations
     mru: <?php echo json_encode($t['mru'] ?? 'MRU'); ?>,
-    discount: <?php echo json_encode($t['discount'] ?? 'discount'); ?>
+    discount: <?php echo json_encode($t['discount'] ?? 'discount'); ?>,
+    zone_required: <?php echo json_encode($t['zone_required'] ?? 'Please select both Pickup and Dropoff zones'); ?>
 };
 
 const AppConfig = {
@@ -3091,50 +3092,55 @@ function showOrderConfirmation() {
     const form = document.getElementById('newOrderForm');
     const pickupZone = document.getElementById('pickupZone');
     const dropoffZone = document.getElementById('dropoffZone');
+    const details = document.getElementsByName('details')[0];
     
-    // Validate form fields first
-    if (!form || !form.checkValidity()) {
-        // Show validation errors
-        if (form) {
-            form.reportValidity();
-        }
+    // 1. Check if form exists
+    if (!form) return;
+
+    // 2. Validate basic HTML5 requirements (required fields)
+    if (!form.checkValidity()) {
+        form.reportValidity();
         return;
     }
     
-    // Ensure both zones are selected
-    if (!pickupZone?.value || !dropoffZone?.value) {
-        if (form) {
-            form.reportValidity();
-        }
+    // 3. Explicit check for Zones (The most common reason it "stops")
+    if (!pickupZone.value || !dropoffZone.value) {
+        alert(AppTranslations.zone_required || "Please select both Pickup and Dropoff zones");
         return;
     }
-    
-    // Get zone names for display
-    const pickupZoneText = pickupZone.options[pickupZone.selectedIndex].text;
-    const dropoffZoneText = dropoffZone.options[dropoffZone.selectedIndex].text;
-    
-    // Calculate final price
-    let finalPrice = currentBasePrice - currentDiscount;
-    if (finalPrice < 0) finalPrice = 0;
-    
-    // Update confirmation modal content
-    document.getElementById('confirmPickupZone').textContent = pickupZoneText;
-    document.getElementById('confirmDropoffZone').textContent = dropoffZoneText;
-    document.getElementById('confirmDeliveryPrice').textContent = finalPrice + ' ' + AppTranslations.mru;
-    
-    // Show discount info if applicable
-    const discountInfo = document.getElementById('confirmDiscountInfo');
-    const discountText = document.getElementById('confirmDiscountText');
-    if (currentDiscount > 0 && currentPromoValid) {
-        discountInfo.style.display = 'block';
-        discountText.textContent = '-' + currentDiscount + ' ' + AppTranslations.mru + ' ' + (AppTranslations.discount || 'discount');
-    } else {
-        discountInfo.style.display = 'none';
+
+    try {
+        // Get zone names for display
+        const pickupZoneText = pickupZone.options[pickupZone.selectedIndex].text;
+        const dropoffZoneText = dropoffZone.options[dropoffZone.selectedIndex].text;
+        
+        // Calculate final price
+        let finalPrice = currentBasePrice - currentDiscount;
+        if (finalPrice < 0) finalPrice = 0;
+        
+        // Update confirmation modal content
+        document.getElementById('confirmPickupZone').textContent = pickupZoneText;
+        document.getElementById('confirmDropoffZone').textContent = dropoffZoneText;
+        document.getElementById('confirmDeliveryPrice').textContent = finalPrice + ' ' + (AppTranslations.mru || 'MRU');
+        
+        // Show discount info if applicable
+        const discountInfo = document.getElementById('confirmDiscountInfo');
+        const discountText = document.getElementById('confirmDiscountText');
+        if (currentDiscount > 0 && currentPromoValid) {
+            discountInfo.style.display = 'block';
+            discountText.textContent = '-' + currentDiscount + ' ' + (AppTranslations.mru || 'MRU');
+        } else {
+            discountInfo.style.display = 'none';
+        }
+        
+        // Show the confirmation modal
+        const modalEl = document.getElementById('orderConfirmModal');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    } catch (e) {
+        console.error("Modal Error:", e);
+        alert("System Error: Could not open confirmation. Please refresh.");
     }
-    
-    // Show the confirmation modal
-    var modal = new bootstrap.Modal(document.getElementById('orderConfirmModal'));
-    modal.show();
 }
 
 // Submit the order form after confirmation
